@@ -5,12 +5,20 @@ import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import React from 'react'
 
+
+//Esto lo cambió codemods, pero no estoy seguro de que sea correcto
 type Props = {
     children: React.ReactNode
-    params:{ orgId: string }
+    params: Promise<{ orgId: string }>
 }
 
-const layout = async ({children, params}: Props) => {
+const layout = async (props: Props) => {
+    const params = await props.params;
+
+    const {
+        children
+    } = props;
+
     const orgId = await verifyAndAcceptInvitation()
     const user = await currentUser()
 
@@ -36,9 +44,10 @@ const layout = async ({children, params}: Props) => {
     return <div className='h-screen overflow-hidden'>
         <Sidebar 
             id={params.orgId}
-            type='organization'/>
+            type='organization'
+        />
+        <div className='md:pl-[300px]'></div>
     </div>
-    
 }
 
 export default layout

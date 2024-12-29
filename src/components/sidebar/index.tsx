@@ -41,8 +41,8 @@ const Sidebar = async ({ id, type }:Props) => {
 
     return (
         <>
-            <MenuOptions defaultOpen={true} subaccounts={subaccounts} sidebarOpt={sidebarOpt} sidebarLogo={sideBarLogo} details={details} user={undefined} id={id}/>
-            <MenuOptions subaccounts={subaccounts} sidebarOpt={sidebarOpt} sidebarLogo={sideBarLogo} details={details} user={undefined} id={id}/>
+            <MenuOptions defaultOpen={true} subaccounts={subaccounts} sidebarOpt={sidebarOpt} sidebarLogo={sideBarLogo} details={details} user={user} id={id}/>
+            <MenuOptions subaccounts={subaccounts} sidebarOpt={sidebarOpt} sidebarLogo={sideBarLogo} details={details} user={user} id={id}/>
         </>
     )
 }
