@@ -3,7 +3,8 @@
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { db } from './db'
 import { redirect } from 'next/navigation'
-import { Organization, Plan, User } from '@prisma/client'
+import { Organization, Plan, SubAccount, User } from '@prisma/client'
+import { v4 } from 'uuid'
 
 export const getAuthUserDetails = async () => {
   const user = await currentUser()
@@ -285,4 +286,71 @@ export const getNotificationAndUser = async (orgId: string) => {
   } catch (error) {
     console.log(error)
   }
+}
+
+export const upsertSubAccount = async (subAccount: SubAccount) => {
+  if(!subAccount.companyEmail) return null
+  const orgOwner = await db.user.findFirst({
+    where: { 
+      org: { 
+        id: subAccount.orgId 
+      },
+      role: 'ORG_OWNER',
+    },
+  })
+  if (!orgOwner) return console.log('Error, no fue posible crear la subcuenta')
+  const permissionId = v4()
+  const response = await db.subAccount.upsert({
+    where: { id: subAccount.id },
+    update: subAccount,
+    create: {
+      ...subAccount,
+      Permissions: {
+        create: {
+          access: true,
+          email: orgOwner.email,
+          id: permissionId,
+        },
+        connect: {
+          subAccountId: subAccount.id,
+          id: permissionId,
+        }
+      },
+      SidebarOption: {
+        create: [
+          {
+            name: 'Dashboard',
+            icon: 'layout-dashboard',
+            link: `/organization/${subAccount.id}`,
+          },
+          {
+            name: 'Launchpad',
+            icon: 'clipboard',
+            link: `/organization/${subAccount.id}/launchpad`,
+          },
+          {
+            name: 'Billing',
+            icon: 'credit-card',
+            link: `/organization/${subAccount.id}/billing`,
+          },
+          {
+            name: 'Settings',
+            icon: 'settings',
+            link: `/organization/${subAccount.id}/settings`,
+          },
+          {
+            name: 'Sub Accounts',
+            icon: 'book-user',
+            link: `/organization/${subAccount.id}/all-subaccounts`,
+          },
+          {
+            name: 'Team',
+            icon: 'users',
+            link: `/organization/${subAccount.id}/team`,
+          },
+        ] 
+      }
+    }
+  })
+  return response
 }

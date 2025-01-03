@@ -46,7 +46,7 @@ const layout = async (props: Props) => {
             id={params.orgId}
             type='organization'
         />
-        <div className='md:pl-[300px]'></div>
+        <div className='md:pl-[300px]'>{children}</div>
     </div>
 }
 

@@ -7,7 +7,7 @@ import clsx from 'clsx';
 // Componente reutilizable
 export const ProjectCard = ({ project, statusIcons }: { project: any, statusIcons: any }) => {
   return (
-    <Card className="w-[350px] h-auto shadow-xl" key={project.name}>
+    <Card className="w-[350px] h-auto shadow-xl hover:scale-105 transition-transform duration-200" key={project.name}>
       {/* Encabezado */}
       <CardHeader className="m-1">
         <div className="flex justify-between">
@@ -61,7 +61,7 @@ export const ProjectCard = ({ project, statusIcons }: { project: any, statusIcon
             >
               {project.budget !== undefined
                 ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                    project.budget
+                    project.income
                   )
                 : 'N/A'}
             </span>
@@ -74,7 +74,7 @@ export const ProjectCard = ({ project, statusIcons }: { project: any, statusIcon
             >
               {project.budget !== undefined
                 ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                    project.budget
+                    project.expense
                   )
                 : 'N/A'}
             </span>

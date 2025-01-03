@@ -36,6 +36,8 @@ export const projects = [
     location: 'Guadalajara', 
     estimated_completion: '2024-12-31',
     budget: 1500000.0,
+    income: 1225000,
+    expense: 1016112.50,
     description: 'Proyecto de construcción de edificio comercial'
   },
   {
@@ -45,6 +47,8 @@ export const projects = [
     location: 'Chapala', 
     estimated_completion: '2024-09-10',
     budget: 6500000.0,
+    income: 6525000.0,
+    expense: 5972923.0,
     description: 'Casa de campo con estilo rústico' 
   }
 ]
@@ -54,3 +58,36 @@ export const statusIcons = {
   "Completado": "🏁",
   "Planeando": "📝",
 };
+
+export const getSideBar = (subAccountId: string) => [
+  {
+    name: 'Dashboard',
+    icon: 'layout-dashboard',
+    link: `/organization/${subAccountId}`,
+  },
+  {
+    name: 'Launchpad',
+    icon: 'clipboard',
+    link: `/organization/${subAccountId}/launchpad`,
+  },
+  {
+    name: 'Billing',
+    icon: 'credit-card',
+    link: `/organization/${subAccountId}/billing`,
+  },
+  {
+    name: 'Settings',
+    icon: 'settings',
+    link: `/organization/${subAccountId}/settings`,
+  },
+  {
+    name: 'Sub Accounts',
+    icon: 'book-user',
+    link: `/organization/${subAccountId}/all-subaccounts`,
+  },
+  {
+    name: 'Team',
+    icon: 'users',
+    link: `/organization/${subAccountId}/team`,
+  }
+];
