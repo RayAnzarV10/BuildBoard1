@@ -1,0 +1,25 @@
+
+Cayetana
+    - Dashboard
+        - Ingresos    (This might be only visible for ORG_OWNER)
+        - Gastos      (This might be only visible for ORG_OWNER)
+        - Impuestos   (This might be only visible for ORG_OWNER)
+    - Proyectos [Presupuestos, riesgos x clima, riesgo en costos, imágenes, lugar en Google Maps]
+        - Todos
+        - Completados
+        - En Progreso
+        - Planeación
+    - Calendario
+    - Equipo
+    - Clientes
+    - Proveedores
+    - Facturación
+
+Administración (Only visible for ORG_OWNER)
+    - Nómina
+    - Contratos
+    - Informes periódicos [Ingresos totales, gastos totales, balanza, proyectos terminados y empezados, información relevante]
+    - Feedback IA
+
+Notificaciones
+    - Alertas de IA, cuidado con la liquidez, cobrar a x persona, pagar x cosa, etc

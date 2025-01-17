@@ -25,8 +25,8 @@ export default function Home() {
 
         {/* Projects Grid with improved spacing */}
         <div className="flex justify-center flex-wrap gap-4 mt-12 w-full max-w-6xl mx-auto">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} statusIcons={statusIcons} />
+          {projects.slice(0, 2).map((project) => (
+            <ProjectCard key={project.id} project={project} statusIcons={statusIcons} className="shadow-xl hover:scale-105 transition-transform duration-200"/>
           ))}
         </div>
       </section>

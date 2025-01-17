@@ -37,16 +37,8 @@ const layout = async (props: Props) => {
 
     return <Unauthorized/>
 
-    let allNoti: any = []
-    const notifications = await getNotificationAndUser(orgId)
-    if ( notifications ) allNoti = notifications
-
-    return <div className='h-screen overflow-hidden'>
-        <Sidebar 
-            id={params.orgId}
-            type='organization'
-        />
-        <div className='md:pl-[300px]'>{children}</div>
+    return <div>
+        {children}
     </div>
 }
 

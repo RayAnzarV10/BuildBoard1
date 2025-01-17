@@ -5,9 +5,9 @@ import { MapPin, CalendarDays, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
 
 // Componente reutilizable
-export const ProjectCard = ({ project, statusIcons }: { project: any, statusIcons: any }) => {
+export const ProjectCard = ({ project, statusIcons, className }: { project: any, statusIcons: any, className?: string }) => {
   return (
-    <Card className="w-[350px] h-auto shadow-xl hover:scale-105 transition-transform duration-200" key={project.name}>
+    <Card className={clsx("w-[300px] max-h-[415px]", className)} key={project.name}>
       {/* Encabezado */}
       <CardHeader className="m-1">
         <div className="flex justify-between">
@@ -23,7 +23,7 @@ export const ProjectCard = ({ project, statusIcons }: { project: any, statusIcon
           <span className="font-bold">#{project.id}</span>
         </div>
         <CardTitle className="flex justify-between font-bold">{project.name}</CardTitle>
-        <CardDescription className="break-words">{project.description}</CardDescription>
+        <CardDescription className="truncate">{project.description}</CardDescription>
       </CardHeader>
 
       {/* Contenido */}
@@ -56,7 +56,7 @@ export const ProjectCard = ({ project, statusIcons }: { project: any, statusIcon
           <div className="flex-col">
             <p>Ingresos Totales</p>
             <span
-              className="text-green-600 font-bold"
+              className="text-green-600 font-semibold"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
               {project.budget !== undefined
@@ -69,7 +69,7 @@ export const ProjectCard = ({ project, statusIcons }: { project: any, statusIcon
           <div className="flex-col">
             <p>Gastos Totales</p>
             <span
-              className="text-red-600 font-bold"
+              className="text-red-600 font-semibold"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
               {project.budget !== undefined

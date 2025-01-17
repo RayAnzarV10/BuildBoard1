@@ -1,13 +1,13 @@
-'use client'
-import { useParams } from 'next/navigation'
+import Dashboard from "@/components/dashboard/main"
+import NavBar from "@/components/site/navigation/navBar"
 
-//Esto es diferente a lo del tutorial, si algo sale mal despues de esto, revisar esta parte
 
 const Page = () => {
-  const params = useParams()
   
   return (
-    <div>{params.orgId}</div>
+    <NavBar>
+      <Dashboard />
+    </NavBar>
   )
 }
 

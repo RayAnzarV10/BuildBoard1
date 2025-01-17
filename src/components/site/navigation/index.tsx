@@ -10,7 +10,7 @@ type Props = {
     user?:null | User
 }
 
-const Navigation = ( { user } : Props) => {
+const Navigation = async( { user } : Props) => {
   return <div className='p-2 flex items-center justify-between fixed shadow-lg top-0 right-0 left-0 z-10 bg-secondary'>
     <aside className='flex items-center gap-2'>
         <Image 
@@ -41,18 +41,17 @@ const Navigation = ( { user } : Props) => {
     </nav>
     <aside className='flex gap-2 items-center'>
         <Link href={"/organization"}>
-        <SignedIn>
-            <Button variant='outline' size='sm' className="font-bold block hover:transition duration-300 relative group">
-                Dashboard
+        {
+            await currentUser()? 
+                <Button variant='outline' size='sm' className="font-bold block hover:transition duration-300 relative group">
+                    Dashboard
                 <span className="absolute left-1/2 bottom-0 w-0 h-0.5 bg-blue-600 group-hover:w-[100%] transition-all duration-300 transform -translate-x-1/2"></span>
-            </Button>
-        </SignedIn>
-        <SignedOut>
-            <button className="text-blue-600 font-bold block hover:transition duration-300 relative group">
-                Iniciar Sesión
-                <span className="absolute left-1/2 bottom-0 w-0 h-0.5 bg-blue-600 group-hover:w-[100%] transition-all duration-300 transform -translate-x-1/2"></span>
-            </button>
-        </SignedOut>
+                </Button> 
+                :
+                <Button variant='default' size='sm' className="font-bold block hover:transition duration-300 relative group">
+                    Iniciar Sesión
+                </Button>
+        }
         </Link>
         <UserButton />
         <ModeToggle/>
