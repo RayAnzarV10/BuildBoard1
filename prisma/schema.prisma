@@ -14,43 +14,11 @@ datasource db {
   relationMode = "prisma"
 }
 
-enum Icon {
-  settings
-  chart
-  calendar
-  check
-  chip
-  compass
-  database
-  flag
-  home
-  info
-  link
-  lock
-  messages
-  notification
-  payment
-  power
-  receipt
-  shield
-  star
-  tune
-  videorecorder
-  wallet
-  warning
-  headphone
-  send
-  pipelines
-  person
-  category
-  contact
-  clipboardIcon
-}
 
 model Organization {
   id                      String              @id @default(uuid())
   connectAccountId        String?             @default("")
-  // customerId              String?             @default("")           
+  customerId              String?             @default("")           
   name                    String          
   logo                    String              @db.Text
   description             String              @db.Text
@@ -71,75 +39,22 @@ model Organization {
   projects                Project[]
   supplier                Supplier[]
   invitation              Invitation[]
-  SubAccount              SubAccount[]
   subscription            Subscription?
   notification            Notification[]
-  SidebarOption           OrgSidebarOption[]
   teammembers             String
   financingType           String              @db.Text
   productsAndServices     String              @db.Text
   pains                   String              @db.Text
   expectations            String              @db.Text
   paymentMethods          String              @db.Text
+  Income                  Income[]
+  Expense                 Expense[]
 
   @@index([id])
 }
 
-model SubAccount {
-  id               String                    @id @default(uuid())
-  connectAccountId String?                   @default("")
-  name             String
-  subAccountLogo   String                    @db.Text
-  createdAt        DateTime                  @default(now())
-  updatedAt        DateTime                  @updatedAt
-  companyEmail     String                    @db.Text
-  companyPhone     String
-  goal             Int                       @default(5)
-  address          String
-  city             String
-  zipCode          String
-  state            String
-  country          String
-  orgId            String
-  org              Organization              @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  SidebarOption    SubAccountSidebarOption[]
-  Permissions      Permissions[]
-  mediaExpense     MediaExpense[]
-  mediaIncome      MediaIncome[]
-  notification     Notification[]
-
-  @@index([orgId])
-}
-
-model OrgSidebarOption {
-  id          String            @id @default(uuid())
-  name        String            @default("Menu")
-  link        String            @default("#")
-  icon        Icon              @default(info)
-  orgId       String
-  org         Organization?     @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-
-  @@index([orgId])
-}
-
-model SubAccountSidebarOption {
-  id           String           @id @default(uuid())
-  name         String           @default("Menu")
-  link         String           @default("#")
-  subAccountId String?
-  icon         Icon             @default(info)
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  SubAccount   SubAccount?      @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
-
-  @@index([subAccountId])
-}
-
 model MediaExpense {
   id              String        @id @default(uuid())
-  subAccountId    String
   name            String
   type            String?
   link            String        @unique
@@ -147,26 +62,21 @@ model MediaExpense {
   expense         Expense       @relation(fields: [expenseId], references: [id], onDelete: Cascade)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  subAccount      SubAccount    @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
 
   @@index([expenseId])
-  @@index([subAccountId])
 }
 
 model MediaIncome {
   id              String        @id @default(uuid())
-  subAccountId    String
-  subAccount      SubAccount    @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
   name            String
   type            String?
   link            String        @unique
   incomeId        String
   income          Income        @relation(fields: [incomeId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   @@index([incomeId])
-  @@index([subAccountId])
 }
 
 model AddOns {
@@ -186,19 +96,16 @@ model Notification {
   id                String            @id @default(uuid())
   notification      String
   orgId             String
-  subAccountId      String?
   userId            String
 
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   org               Organization      @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  subAccount        SubAccount?       @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
 
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
   @@index([orgId])
   @@index([userId])
-  @@index([subAccountId])
 }
 
 enum Plan {
@@ -251,12 +158,9 @@ model User {
 model Permissions {
   id              String        @id @default(uuid())
   email           String    
-  User            User          @relation(fields: [email], references: [email], onDelete: Cascade)
-  subAccountId    String    
-  SubAccount      SubAccount    @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [email], references: [email], onDelete: Cascade)
   access          Boolean
 
-  @@index([subAccountId])
   @@index([email])
 }
 
@@ -339,6 +243,8 @@ model Supplier {
 
 model Income {
   id String @id @default(uuid())
+  orgId String
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   projectId String
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -358,10 +264,13 @@ model Income {
 
   @@index([projectId])
   @@index([clientId])
+  @@index([orgId])
 }
 
 model Expense {
   id String @id @default(uuid())
+  orgId String
+  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
   projectId String
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -385,4 +294,5 @@ model Expense {
 
   @@index([projectId])
   @@index([supplierId])
+  @@index([orgId])
 }

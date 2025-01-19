@@ -7,7 +7,7 @@ import clsx from 'clsx';
 // Componente reutilizable
 export const ProjectCard = ({ project, statusIcons, className }: { project: any, statusIcons: any, className?: string }) => {
   return (
-    <Card className={clsx("w-[300px] max-h-[415px]", className)} key={project.name}>
+    <Card className={clsx("max-h-[415px]", className)} key={project.name}>
       {/* Encabezado */}
       <CardHeader className="m-1">
         <div className="flex justify-between">

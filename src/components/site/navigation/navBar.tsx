@@ -5,7 +5,6 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { getAuthUserDetails, getNotificationAndUser } from '@/lib/queries'
 import { UserButton } from '@clerk/nextjs'
 import { currentUser } from '@clerk/nextjs/server'
-import { Bell } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 import { ReactNode } from 'react';
@@ -18,7 +17,6 @@ const NavBar = async ({ children }: { children: ReactNode }) => {
     if (!user.org) return 
     
     let logo = user.org.logo || '/assets/logoBuildBoard.svg'
-    let orgColor = user.org.primary_color || '#000'
     let orgName = user.org.name || 'BuildBoard'
     let orgId = user.org.id || ''
     let orgEmail = user.org.email || ''

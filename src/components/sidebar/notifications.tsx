@@ -26,7 +26,6 @@ type Props = {
 
 export function Notifications({ notifications } : Props) {
   const [allNotifications, setAllNotifications] = useState(notifications)
-  const [showAll, setShowAll] = useState(true)
 
   return (
     <Sheet>

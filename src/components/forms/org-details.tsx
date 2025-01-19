@@ -130,7 +130,7 @@ const OrgDetails = ({data}:Props) => {
       if (!data?.id) {
         const response = await upsertOrg({
           id: data?.id ? data.id : v4(),
-          // customerId: data?.customerId || customerId || '',
+          customerId: data?.customerId || customerId || '',
           address: values.address,
           logo: values.logo,
           city: values.city,

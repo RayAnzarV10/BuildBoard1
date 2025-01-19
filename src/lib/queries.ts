@@ -3,7 +3,7 @@
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { db } from './db'
 import { redirect } from 'next/navigation'
-import { Organization, Plan, SubAccount, User } from '@prisma/client'
+import { Organization, Plan, ProjectStatus, User } from '@prisma/client'
 import { v4 } from 'uuid'
 
 export const getAuthUserDetails = async () => {
@@ -19,12 +19,6 @@ export const getAuthUserDetails = async () => {
     include: {
       org: {
         include: {
-          SidebarOption: true,
-          SubAccount: {
-            include: {
-              SidebarOption: true,
-            },
-          },
         },
       },
       Permissions: true,
@@ -34,90 +28,77 @@ export const getAuthUserDetails = async () => {
   return userData
 }
 
-export const saveActivityLogsNotification = async ({
-  orgId,
-  description,
-  subaccountId,
-}: {
-  orgId?: string
-  description: string
-  subaccountId?: string
-}) => {
-  const authUser = await currentUser()
-  let userData
-  if (!authUser) {
-    const response = await db.user.findFirst({
-      where: {
-        org: {
-          SubAccount: {
-            some: { id: subaccountId },
-          },
-        },
-      },
-    })
-    if (response) {
-      userData = response
-    }
-  } else {
-    userData = await db.user.findUnique({
-      where: { email: authUser?.emailAddresses[0].emailAddress },
-    })
-  }
+// export const saveActivityLogsNotification = async ({
+//   orgId,
+//   description,
+// }: {
+//   orgId?: string
+//   description: string
+// }) => {
+//   const authUser = await currentUser()
+//   let userData
+//   if (!authUser) {
+//     const response = await db.user.findFirst({
+//       where: {
+//         org: {
+//         },
+//       },
+//     })
+//     if (response) {
+//       userData = response
+//     }
+//   } else {
+//     userData = await db.user.findUnique({
+//       where: { email: authUser?.emailAddresses[0].emailAddress },
+//     })
+//   }
 
-  if (!userData) {
-    console.log('Could not find a user')
-    return
-  }
+//   if (!userData) {
+//     console.log('Could not find a user')
+//     return
+//   }
 
-  let foundOrgId = orgId
-  if (!foundOrgId) {
-    if (!subaccountId) {
-      throw new Error(
-        'You need to provide at least an organization Id or subaccount Id'
-      )
-    }
-    const response = await db.subAccount.findUnique({
-      where: { id: subaccountId },
-    })
-    if (response) foundOrgId = response.orgId
-  }
-  if (subaccountId) {
-    await db.notification.create({
-      data: {
-        notification: `${userData.name} | ${description}`,
-        user: {
-          connect: {
-            id: userData.id,
-          },
-        },
-        org: {
-          connect: {
-            id: foundOrgId,
-          },
-        },
-        subAccount: {
-          connect: { id: subaccountId },
-        },
-      },
-    })
-  } else {
-    await db.notification.create({
-      data: {
-        notification: `${userData.name} | ${description}`,
-        user: {
-          connect: {
-            id: userData.id,
-          },
-        },
-        org: {
-          connect: {
-            id: foundOrgId,
-          },
-        },
-      },
-    })
-  }
-}
+//   let foundOrgId = orgId
+//   if (!foundOrgId) {
+//     }
+//   }
+//   if (subaccountId) {
+//     await db.notification.create({
+//       data: {
+//         notification: `${userData.name} | ${description}`,
+//         user: {
+//           connect: {
+//             id: userData.id,
+//           },
+//         },
+//         org: {
+//           connect: {
+//             id: foundOrgId,
+//           },
+//         },
+//         subAccount: {
+//           connect: { id: subaccountId },
+//         },
+//       },
+//     })
+//   } else {
+//     await db.notification.create({
+//       data: {
+//         notification: `${userData.name} | ${description}`,
+//         user: {
+//           connect: {
+//             id: userData.id,
+//           },
+//         },
+//         org: {
+//           connect: {
+//             id: foundOrgId,
+//           },
+//         },
+//       },
+//     })
+//   }
+// }
 
 export const createTeamUser = async (orgId: string, user: User) => {
   if (user.role === 'ORG_OWNER') return null
@@ -145,11 +126,6 @@ export const verifyAndAcceptInvitation = async () => {
       role: invitationExists.role,
       createdAt: new Date(),
       updatedAt: new Date(),
-    })
-    await saveActivityLogsNotification({
-      orgId: invitationExists?.orgId,
-      description: `Joined`,
-      subaccountId: undefined,
     })
 
     if (userDetails) {
@@ -231,40 +207,6 @@ export const upsertOrg = async (organization: Organization, price?: Plan) => {
           connect: { email: organization.email },
         },
         ...organization,
-        SidebarOption: {
-          create: [
-            {
-              name: 'Dashboard',
-              icon: 'category',
-              link: `/organization/${organization.id}`,
-            },
-            {
-              name: 'Launchpad',
-              icon: 'clipboardIcon',
-              link: `/organization/${organization.id}/launchpad`,
-            },
-            {
-              name: 'Billing',
-              icon: 'payment',
-              link: `/organization/${organization.id}/billing`,
-            },
-            {
-              name: 'Settings',
-              icon: 'settings',
-              link: `/organization/${organization.id}/settings`,
-            },
-            {
-              name: 'Sub Accounts',
-              icon: 'person',
-              link: `/organization/${organization.id}/all-subaccounts`,
-            },
-            {
-              name: 'Team',
-              icon: 'shield',
-              link: `/organization/${organization.id}/team`,
-            },
-          ] 
-        }
       }
     })
     return orgDetails
@@ -288,69 +230,26 @@ export const getNotificationAndUser = async (orgId: string) => {
   }
 }
 
-export const upsertSubAccount = async (subAccount: SubAccount) => {
-  if(!subAccount.companyEmail) return null
-  const orgOwner = await db.user.findFirst({
+export const getOrganizationIncome = async (orgId: string) => {
+  return await db.income.findMany({
+    where: { orgId }
+  });
+};
+
+export const getProjectIncome = async (orgId: string, projectId: string) => {
+  return await db.income.findMany({
     where: { 
-      org: { 
-        id: subAccount.orgId 
-      },
-      role: 'ORG_OWNER',
-    },
-  })
-  if (!orgOwner) return console.log('Error, no fue posible crear la subcuenta')
-  const permissionId = v4()
-  const response = await db.subAccount.upsert({
-    where: { id: subAccount.id },
-    update: subAccount,
-    create: {
-      ...subAccount,
-      Permissions: {
-        create: {
-          access: true,
-          email: orgOwner.email,
-          id: permissionId,
-        },
-        connect: {
-          subAccountId: subAccount.id,
-          id: permissionId,
-        }
-      },
-      SidebarOption: {
-        create: [
-          {
-            name: 'Dashboard',
-            icon: 'layout-dashboard',
-            link: `/organization/${subAccount.id}`,
-          },
-          {
-            name: 'Launchpad',
-            icon: 'clipboard',
-            link: `/organization/${subAccount.id}/launchpad`,
-          },
-          {
-            name: 'Billing',
-            icon: 'credit-card',
-            link: `/organization/${subAccount.id}/billing`,
-          },
-          {
-            name: 'Settings',
-            icon: 'settings',
-            link: `/organization/${subAccount.id}/settings`,
-          },
-          {
-            name: 'Sub Accounts',
-            icon: 'book-user',
-            link: `/organization/${subAccount.id}/all-subaccounts`,
-          },
-          {
-            name: 'Team',
-            icon: 'users',
-            link: `/organization/${subAccount.id}/team`,
-          },
-        ] 
-      }
+      orgId,
+      projectId 
     }
-  })
-  return response
+  });
+};
+
+export const getProjectWhere = async (orgId: string, status: ProjectStatus) => {
+  return await db.project.findMany({
+    where: {
+      orgId: orgId,
+      status: status
+    }
+  });
 }

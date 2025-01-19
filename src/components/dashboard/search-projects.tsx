@@ -1,47 +1,74 @@
+'use client'
+
 import { projects, statusIcons } from "@/lib/constants"
 import { ProjectCard } from "../ui/card_buildboard"
 import { ScrollArea } from "../ui/scroll-area"
 import { Input } from "@/components/ui/input"
-import { useCallback, useState, useEffect } from "react"
+import { useState } from "react"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 
-interface SearchBarProps {
-  onSearch: (term: string) => void;
-  onStatusChange: (status: string) => void;
-  onSortChange: (sort: string) => void;
-}
+export default function Projects() {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [status, setStatus] = useState("all")
+  const [sortOrder, setSortOrder] = useState("none")
 
-function SearchBar({ onSearch, onStatusChange, onSortChange }: SearchBarProps) {
-  const [term, setTerm] = useState('')
+  // Apply all filters in a single function
+  const getFilteredAndSortedProjects = () => {
+    // Start with all projects
+    let filteredProjects = [...projects]
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTerm = e.target.value
-    setTerm(newTerm)
-    onSearch(newTerm)
-  }, [onSearch])
+    // 1. First apply search filter if there is a search term
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase()
+      filteredProjects = filteredProjects.filter(project => 
+        project.name.toLowerCase().includes(term) ||
+        project.description.toLowerCase().includes(term) ||
+        project.id.toLowerCase().includes(term)
+      )
+    }
 
-  const handleStatusChange = useCallback((value: string) => {
-    onStatusChange(value)
-  }, [onStatusChange])
+    // 2. Then apply status filter if a specific status is selected
+    if (status !== "all") {
+      filteredProjects = filteredProjects.filter(project => 
+        project.status.toLowerCase() === status.toLowerCase()
+      )
+    }
 
-  const handleSortChange = useCallback((value: string) => {
-    onSortChange(value)
-  }, [onSortChange])
+    // 3. Finally, apply sorting if a sort order is selected
+    if (sortOrder !== "none") {
+      filteredProjects.sort((a, b) => {
+        const dateA = new Date(a.estimated_completion)
+        const dateB = new Date(b.estimated_completion)
+        return sortOrder === "newest" 
+          ? dateB.getTime() - dateA.getTime()
+          : dateA.getTime() - dateB.getTime()
+      })
+    }
+
+    return filteredProjects
+  }
 
   return (
-    <div className="flex-none space-y-4">
-      <div className="w-full">
-        <Input
-          type="text"
-          className="truncate"
-          placeholder="Buscar proyecto..."
-          value={term}
-          onChange={handleChange}
-        />
-      </div>
-      <div className="flex flex-row gap-4">
-        <div className="flex-1">
-          <Select onValueChange={handleStatusChange}>
+    <Card className="bg-primary-foreground shadow-lg dark:bg-card w-full">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-2xl font-bold truncate">
+          Proyectos
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex space-x-4">
+          <Input
+            type="text"
+            className="truncate"
+            placeholder="Buscar proyecto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Select 
+            value={status} 
+            onValueChange={setStatus}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Estatus" />
             </SelectTrigger>
@@ -49,15 +76,16 @@ function SearchBar({ onSearch, onStatusChange, onSortChange }: SearchBarProps) {
               <SelectGroup>
                 <SelectLabel>Fase del Proyecto</SelectLabel>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="completado">Completado</SelectItem>
-                <SelectItem value="en-progreso">En Progreso</SelectItem>
-                <SelectItem value="planeacion">Planeación</SelectItem>
+                <SelectItem value="En Progreso">En Progreso</SelectItem>
+                <SelectItem value="Completado">Completado</SelectItem>
+                <SelectItem value="Planeando">Planeación</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
-        </div>
-        <div className="flex-1">
-          <Select onValueChange={handleSortChange}>
+          <Select 
+            value={sortOrder} 
+            onValueChange={setSortOrder}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Ordenar por" />
             </SelectTrigger>
@@ -71,95 +99,23 @@ function SearchBar({ onSearch, onStatusChange, onSortChange }: SearchBarProps) {
             </SelectContent>
           </Select>
         </div>
-      </div>
-    </div>
+        <ScrollArea className="rounded-md items-center h-96">
+          {getFilteredAndSortedProjects().length === 0 ? (
+            <p className="w-full text-center text-muted-foreground">No se encontraron proyectos</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {getFilteredAndSortedProjects().map(project => (
+                <ProjectCard 
+                  key={project.id} 
+                  project={project} 
+                  statusIcons={statusIcons} 
+                />
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </CardContent>
+    </Card>
   )
 }
 
-interface CardListProps {
-  cards: typeof projects;
-}
-
-function CardList2({ cards }: CardListProps) {
-  return (
-    <ScrollArea className="h-[calc(100dvh-15rem)] md:h-[calc(100dvh-18.5rem)] rounded-md">
-      <div className="grid grid-cols-1 gap-4">
-        {cards.length === 0 ? (
-          <p className="text-center text-muted-foreground">No se encontraron proyectos</p>
-        ) : (
-          cards.map(card => (
-            <ProjectCard key={card.id} project={card} statusIcons={statusIcons} />
-          ))
-        )}
-      </div>
-    </ScrollArea>
-  )
-}
-
-export default function Projects() {
-  const [cards, setCards] = useState(projects)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedStatus, setSelectedStatus] = useState('all')
-  const [sortOrder, setSortOrder] = useState('none') // Cambiado el valor inicial
-
-  const filterAndSortCards = useCallback(() => {
-    let filtered = [...projects];
-    
-    // Filtrar por término de búsqueda
-    if (searchTerm) {
-      filtered = filtered.filter(
-        card => 
-          card.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          card.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          card.id.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-    
-    // Filtrar por status
-    if (selectedStatus !== 'all') {
-      filtered = filtered.filter(card => card.status === selectedStatus)
-    }
-    
-    // Ordenar por fecha solo si se ha seleccionado un orden
-    if (sortOrder !== 'none') {
-      filtered.sort((a, b) => {
-        const dateA = new Date(a.estimated_completion).getTime()
-        const dateB = new Date(b.estimated_completion).getTime()
-        return sortOrder === 'newest' ? dateB - dateA : dateA - dateB
-      })
-    }
-    
-    setCards(filtered)
-  }, [searchTerm, selectedStatus, sortOrder])
-
-  const handleSearch = useCallback((term: string) => {
-    setSearchTerm(term)
-  }, [])
-
-  const handleStatusChange = useCallback((status: string) => {
-    setSelectedStatus(status)
-  }, [])
-
-  const handleSortChange = useCallback((sort: string) => {
-    setSortOrder(sort)
-  }, [])
-
-  // Efecto para aplicar los filtros cuando cambian los criterios
-  useEffect(() => {
-    filterAndSortCards()
-  }, [filterAndSortCards, searchTerm, selectedStatus, sortOrder])
-
-  return (
-    <div className="rounded-md bg-primary-foreground dark:bg-background shadow-[0_0_100px_rgba(0,0,0,0.1)] p-4 w-[333px]">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold mb-4 flex-none">Proyectos</h1>
-        <SearchBar 
-          onSearch={handleSearch} 
-          onStatusChange={handleStatusChange} 
-          onSortChange={handleSortChange}
-        />
-        <CardList2 cards={cards} />
-      </div>
-    </div>
-  )
-}
