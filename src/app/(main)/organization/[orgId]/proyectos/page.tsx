@@ -1,4 +1,5 @@
 import Projects from "@/components/dashboard/search-projects";
+import NavBar from "@/components/site/navigation/navBar";
 
 export default async function ProjectDetails({ 
   params 
@@ -9,6 +10,9 @@ export default async function ProjectDetails({
   const { orgId, projectId } = await params;
 
   return (
-    <Projects orgId={orgId} />
+    <NavBar>
+      <Projects orgId={orgId} />
+    </NavBar>
+  
   );
 }

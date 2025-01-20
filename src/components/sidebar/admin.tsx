@@ -31,7 +31,7 @@ export function NavAdmin({
             >
               <SidebarMenuItem className="hover:bg-muted rounded-md hover:shadow-lg">
                 <SidebarMenuButton asChild>
-                  <a href={`${orgId}/${item.url}`}>
+                  <a href={`/organization/${orgId}/${item.url}`}>
                     {item.icon && <item.icon />}
                     <span className="font-semibold">{item.title}</span>
                     {item.isBeta && (

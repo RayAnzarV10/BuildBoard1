@@ -74,68 +74,70 @@ export default function Projects({ orgId }: { orgId: string }) {
     return filteredProjects
   }
 
-  if (loading) {
-    return <p>Cargando proyectos...</p>
-  }
-
   return (
     <Card className="bg-primary-foreground shadow-lg dark:bg-card w-full">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex space-x-4">
-          <Input
-            type="text"
-            className="truncate"
-            placeholder="Buscar proyecto..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger>
-              <SelectValue placeholder="Estatus" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Fase del Proyecto</SelectLabel>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="In_Progress">En Progreso</SelectItem>
-                <SelectItem value="Completed">Completado</SelectItem>
-                <SelectItem value="Planning">Planeación</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Select value={sortOrder} onValueChange={setSortOrder}>
-            <SelectTrigger>
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Ordenar por Fecha</SelectLabel>
-                <SelectItem value="none">Sin ordenar</SelectItem>
-                <SelectItem value="newest">Más reciente</SelectItem>
-                <SelectItem value="oldest">Más antiguo</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-        <ScrollArea className="rounded-md items-center h-[26rem]">
-          {getFilteredAndSortedProjects().length === 0 ? (
-            <p className="w-full text-center text-muted-foreground">No se encontraron proyectos</p>
-          ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-              {getFilteredAndSortedProjects().map(project => (
-                <Link href={`/organization/${orgId}/proyectos/${project.id}`} key={project.id}>
-                  <ProjectCard
-                    project={project}
-                    className="hover:shadow-md hover:brightness-105 dark:hover:brightness-150 transition-all"
-                  />
-                </Link>
-              ))}
+        {loading ? (
+          <div className="text-gray-400">Cargando proyectos...</div>
+        ) : (
+          <>
+            <div className="flex space-x-4">
+              <Input
+                type="text"
+                className="truncate"
+                placeholder="Buscar proyecto..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Estatus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Fase del Proyecto</SelectLabel>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="In_Progress">En Progreso</SelectItem>
+                    <SelectItem value="Completed">Completado</SelectItem>
+                    <SelectItem value="Planning">Planeación</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Ordenar por Fecha</SelectLabel>
+                    <SelectItem value="none">Sin ordenar</SelectItem>
+                    <SelectItem value="newest">Más reciente</SelectItem>
+                    <SelectItem value="oldest">Más antiguo</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-          )}
-        </ScrollArea>
+            <ScrollArea className="rounded-md items-center h-[26rem]">
+              {getFilteredAndSortedProjects().length === 0 ? (
+                <p className="w-full text-center text-muted-foreground">No se encontraron proyectos</p>
+              ) : (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  {getFilteredAndSortedProjects().map(project => (
+                    <Link href={`/organization/${orgId}/proyectos/${project.id}`} key={project.id}>
+                      <ProjectCard
+                        project={project}
+                        className="hover:shadow-md hover:brightness-105 dark:hover:brightness-150 transition-all"
+                      />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </>
+        )}
       </CardContent>
     </Card>
   )

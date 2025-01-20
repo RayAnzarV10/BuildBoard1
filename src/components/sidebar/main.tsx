@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight, ChevronsUpDown, GalleryVerticalEnd, type LucideIcon } from "lucide-react"
+import { ChevronRight, GalleryVerticalEnd, type LucideIcon } from "lucide-react"
 
 import {
   Collapsible,
@@ -63,7 +63,7 @@ export function NavMain({
                       )}
                     </a>
                     ) : (
-                    <a href={`${orgId}/${item.url}`}>
+                    <a href={`/organization/${orgId}/${item.url}`}>
                       {item.icon && <item.icon />}
                       <span className="font-semibold">{item.title}</span>
                     </a>
@@ -75,7 +75,7 @@ export function NavMain({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={`${orgId}/${subItem.url}`}>
+                            <a href={`/organization/${orgId}/${subItem.url}`}>
                               <span>{subItem.title}</span>
                             </a>
                           </SidebarMenuSubButton>
