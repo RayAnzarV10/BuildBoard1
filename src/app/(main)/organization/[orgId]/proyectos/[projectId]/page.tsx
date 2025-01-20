@@ -1,5 +1,3 @@
-import Projects from "@/components/dashboard/search-projects";
-
 export default async function ProjectDetails({ 
   params 
 }: { 
@@ -9,6 +7,9 @@ export default async function ProjectDetails({
   const { orgId, projectId } = await params;
 
   return (
-    <Projects orgId={orgId} />
+    <div>
+      <p>Organización ID: {orgId}</p>
+      <p>Proyecto ID: {projectId}</p>
+    </div>
   );
 }

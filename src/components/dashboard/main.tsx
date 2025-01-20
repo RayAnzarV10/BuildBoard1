@@ -37,7 +37,7 @@ const Dashboard = async() => {
           </CardContent>
         </Card>
       </div>
-      <Projects />
+      <Projects orgId={ orgId } />
     </div>
   )
 }

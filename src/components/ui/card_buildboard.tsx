@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, CalendarDays, DollarSign } from 'lucide-react';
+import { MapPin, CalendarDays, Wallet } from 'lucide-react';
 import clsx from 'clsx';
+import { statusIcons } from '@/lib/constants';
 
 // Componente reutilizable
-export const ProjectCard = ({ project, statusIcons, className }: { project: any, statusIcons: any, className?: string }) => {
+export const ProjectCard = ({ project, className }: { project: any, className?: string }) => {
   return (
     <Card className={clsx("max-h-[415px]", className)} key={project.name}>
       {/* Encabezado */}
@@ -13,70 +14,72 @@ export const ProjectCard = ({ project, statusIcons, className }: { project: any,
         <div className="flex justify-between">
           <Badge
             className={clsx({
-              'bg-green-100 text-green-600 font-bold': project.status === 'Completado',
-              'bg-blue-100 text-blue-600 font-bold': project.status === 'En Progreso',
-              'bg-yellow-100 text-yellow-600 font-bold': project.status === 'Planeando',
+              'bg-green-100 text-green-600 font-bold': project.status === 'Completed',
+              'bg-blue-100 text-blue-600 font-bold': project.status === 'In_Progress',
+              'bg-yellow-100 text-yellow-600 font-bold': project.status === 'Planning',
             })}
           >
-            {statusIcons[project.status as keyof typeof statusIcons]} {project.status}
+            {statusIcons[project.status as keyof typeof statusIcons]}
           </Badge>
-          <span className="font-bold">#{project.id}</span>
+          <span className="font-bold">#{project.number}</span>
         </div>
-        <CardTitle className="flex justify-between font-bold">{project.name}</CardTitle>
+        <CardTitle className="justify-between font-bold truncate pb-2">{project.name}</CardTitle>
         <CardDescription className="truncate">{project.description}</CardDescription>
       </CardHeader>
 
       {/* Contenido */}
-      <CardContent className="flex m-1 mt-[-10]">
-        <div className="flex flex-col space-y-3">
-          <div className="flex items-center gap-1 break-words">
+      <CardContent className="flex flex-col mt-[-10] space-y-4">
+          <div className="flex items-center gap-1" >
             <MapPin size={16} className="shrink-0" />
-            <span style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{project.location}</span>
+            <span className='truncate'>{project.location}</span>
           </div>
           <div className="flex items-center gap-1">
             <CalendarDays size={16} className="shrink-0" />
-            <span style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
-              {project.estimated_completion}
+            <span className='truncate'>
+              {new Date(project.est_completion).toLocaleDateString("es-MX", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </span>
           </div>
-          <div className="flex items-center gap-1">
-            <DollarSign size={16} className="shrink-0" />
-            <span style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+          <div className="flex flex-row items-center gap-1">
+            <Wallet size={16} className="shrink-0" style={{ marginTop: '0.1em' }}/>
+            <span className='truncate'>
               {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
                 Number(project.budget)
               )}
             </span>
           </div>
-        </div>
       </CardContent>
 
       {/* Footer */}
       <CardFooter className="m-1 mt-[-10]">
-        <div className="border-t w-full flex justify-between items-start pt-2">
-          <div className="flex-col">
+        <div className="border-t w-full flex pt-2">
+          <div className="flex-col w-1/2">
             <p>Ingresos Totales</p>
             <span
               className="text-green-600 font-semibold"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
-              {project.budget !== undefined
+              {project.income
                 ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                    project.income
-                  )
-                : 'N/A'}
+                project.income
+              )
+                : '$0'}
             </span>
           </div>
-          <div className="flex-col">
+          <div className="flex-col w-1/2">
             <p>Gastos Totales</p>
             <span
               className="text-red-600 font-semibold"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
-              {project.budget !== undefined
+              {project.expense 
                 ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                    project.expense
-                  )
-                : 'N/A'}
+                project.expense
+              )
+                : '$0'}
             </span>
           </div>
         </div>

@@ -189,6 +189,7 @@ enum ProjectStatus {
 
 model Project {
   id                    String                @id @default(uuid())
+  number                Int                   
   orgId                 String
   org                   Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
   createdAt             DateTime              @default(now())
@@ -202,6 +203,7 @@ model Project {
   incomes               Income[]
   expenses              Expense[]
 
+  @@unique([orgId, number])
   @@index([orgId])
 }
 

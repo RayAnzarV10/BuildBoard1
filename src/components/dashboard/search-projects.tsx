@@ -1,24 +1,51 @@
 'use client'
 
-import { projects, statusIcons } from "@/lib/constants"
+import { useEffect, useState } from "react"
 import { ProjectCard } from "../ui/card_buildboard"
 import { ScrollArea } from "../ui/scroll-area"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
+import Link from "next/link"
+import { getProjects } from "@/lib/queries"
+import { ProjectStatus } from "@prisma/client"
 
-export default function Projects() {
+export default function Projects({ orgId }: { orgId: string }) {
+  const [projects, setProjects] = useState<Array<{
+    number: number;
+    status: ProjectStatus;
+    est_completion: Date;
+    name: string;
+    id: string;
+    orgId: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+    location: string;
+    budget: number;
+  }>>([]) // Estado para los proyectos
   const [searchTerm, setSearchTerm] = useState("")
   const [status, setStatus] = useState("all")
   const [sortOrder, setSortOrder] = useState("none")
+  const [loading, setLoading] = useState(true) // Estado para la carga
 
-  // Apply all filters in a single function
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjects(orgId)
+        setProjects(data)
+      } catch (error) {
+        console.error("Error fetching projects:", error)
+      } finally {
+        setLoading(false) // Finaliza la carga
+      }
+    }
+    fetchProjects()
+  }, [orgId])
+
   const getFilteredAndSortedProjects = () => {
-    // Start with all projects
     let filteredProjects = [...projects]
 
-    // 1. First apply search filter if there is a search term
     if (searchTerm.trim() !== "") {
       const term = searchTerm.toLowerCase()
       filteredProjects = filteredProjects.filter(project => 
@@ -28,18 +55,16 @@ export default function Projects() {
       )
     }
 
-    // 2. Then apply status filter if a specific status is selected
     if (status !== "all") {
       filteredProjects = filteredProjects.filter(project => 
         project.status.toLowerCase() === status.toLowerCase()
       )
     }
 
-    // 3. Finally, apply sorting if a sort order is selected
     if (sortOrder !== "none") {
       filteredProjects.sort((a, b) => {
-        const dateA = new Date(a.estimated_completion)
-        const dateB = new Date(b.estimated_completion)
+        const dateA = new Date(a.est_completion)
+        const dateB = new Date(b.est_completion)
         return sortOrder === "newest" 
           ? dateB.getTime() - dateA.getTime()
           : dateA.getTime() - dateB.getTime()
@@ -49,12 +74,14 @@ export default function Projects() {
     return filteredProjects
   }
 
+  if (loading) {
+    return <p>Cargando proyectos...</p>
+  }
+
   return (
     <Card className="bg-primary-foreground shadow-lg dark:bg-card w-full">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-2xl font-bold truncate">
-          Proyectos
-        </CardTitle>
+        <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex space-x-4">
@@ -65,10 +92,7 @@ export default function Projects() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Select 
-            value={status} 
-            onValueChange={setStatus}
-          >
+          <Select value={status} onValueChange={setStatus}>
             <SelectTrigger>
               <SelectValue placeholder="Estatus" />
             </SelectTrigger>
@@ -76,16 +100,13 @@ export default function Projects() {
               <SelectGroup>
                 <SelectLabel>Fase del Proyecto</SelectLabel>
                 <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="En Progreso">En Progreso</SelectItem>
-                <SelectItem value="Completado">Completado</SelectItem>
-                <SelectItem value="Planeando">Planeación</SelectItem>
+                <SelectItem value="In_Progress">En Progreso</SelectItem>
+                <SelectItem value="Completed">Completado</SelectItem>
+                <SelectItem value="Planning">Planeación</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Select 
-            value={sortOrder} 
-            onValueChange={setSortOrder}
-          >
+          <Select value={sortOrder} onValueChange={setSortOrder}>
             <SelectTrigger>
               <SelectValue placeholder="Ordenar por" />
             </SelectTrigger>
@@ -99,17 +120,18 @@ export default function Projects() {
             </SelectContent>
           </Select>
         </div>
-        <ScrollArea className="rounded-md items-center h-96">
+        <ScrollArea className="rounded-md items-center h-[26rem]">
           {getFilteredAndSortedProjects().length === 0 ? (
             <p className="w-full text-center text-muted-foreground">No se encontraron proyectos</p>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               {getFilteredAndSortedProjects().map(project => (
-                <ProjectCard 
-                  key={project.id} 
-                  project={project} 
-                  statusIcons={statusIcons} 
-                />
+                <Link href={`/organization/${orgId}/proyectos/${project.id}`} key={project.id}>
+                  <ProjectCard
+                    project={project}
+                    className="hover:shadow-md hover:brightness-105 dark:hover:brightness-150 transition-all"
+                  />
+                </Link>
               ))}
             </div>
           )}
@@ -118,4 +140,3 @@ export default function Projects() {
     </Card>
   )
 }
-

@@ -253,3 +253,11 @@ export const getProjectWhere = async (orgId: string, status: ProjectStatus) => {
     }
   });
 }
+
+export const getProjects = async (orgId: string) => {
+  return await db.project.findMany({
+    where: {
+      orgId: orgId,
+    }
+  });
+}

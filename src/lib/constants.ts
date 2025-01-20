@@ -33,88 +33,88 @@ export const pricingCards = [
 
 export const projects = [
   {
-    id: '1',
+    number: '1',
     name: 'Edificio A',
-    status: 'En Progreso', 
+    status: 'In_Progress', 
     location: 'Guadalajara', 
-    estimated_completion: '2024-12-31',
+    est_completion: '2024-12-31',
     budget: 1500000.0,
     income: 1225000,
     expense: 1016112.50,
     description: 'Proyecto de construcción de edificio comercial'
   },
   {
-    id: '2',
+    number: '2',
     name: 'Casa Madero',
-    status: 'Completado', 
+    status: 'Completed', 
     location: 'Chapala', 
-    estimated_completion: '2024-09-10',
+    est_completion: '2024-09-10',
     budget: 6500000.0,
     income: 6525000.0,
     expense: 5972923.0,
     description: 'Casa de campo con estilo rústico' 
   },
   {
-    id: '3',
+    number: '3',
     name: 'Casa de la Sierra',
     status: 'Planeando', 
     location: 'Tapalpa', 
-    estimated_completion: '2024-06-30',
+    est_completion: '2024-06-30',
     budget: 4500000.0,
     income: 0.0,
     expense: 0.0,
     description: 'Casa de campo con estilo moderno' 
   },
   {
-    id: '4',
+    number: '4',
     name: 'Edificio B',
     status: 'Planeando', 
     location: 'Zapopan', 
-    estimated_completion: '2024-12-31',
+    est_completion: '2024-12-31',
     budget: 2000000.0,
     income: 0.0,
     expense: 0.0,
     description: 'Proyecto de construcción de edificio comercial' 
   },
   {
-    id: '5',
+    number: '5',
     name: 'Casa de la Colina',
     status: 'Completado', 
     location: 'Tlaquepaque', 
-    estimated_completion: '2024-09-10',
+    est_completion: '2024-09-10',
     budget: 3500000.0,
     income: 3525000.0,
     expense: 2972923.0,
     description: 'Casa de campo con estilo rústico' 
   },
   {
-    id: '6',
+    number: '6',
     name: 'Edificio C',
     status: 'En Progreso', 
     location: 'Zapopan', 
-    estimated_completion: '2024-12-31',
+    est_completion: '2024-12-31',
     budget: 2500000.0,
     income: 2225000.0,
     expense: 2016112.50,
     description: 'Proyecto de construcción de edificio comercial' 
   },
   {
-    id: '7',
+    number: '7',
     name: 'Casa de la Laguna',
     status: 'Planeando', 
     location: 'Chapala', 
-    estimated_completion: '2024-06-30',
+    est_completion: '2024-06-30',
     budget: 1500000.0,
     income: 0.0,
     expense: 0.0,
     description: 'Casa de campo con estilo moderno' 
   },
   {
-    id: '8',
+    number: '8',
     name: 'Casa de la Montaña',
     status: 'Completado', 
     location: 'Tapalpa', 
-    estimated_completion: '2024-09-10',
+    est_completion: '2024-09-10',
     budget: 5500000.0,
     income: 5525000.0,
     expense: 4972923.0,
@@ -123,10 +123,11 @@ export const projects = [
 ]
 
 export const statusIcons = {
-  "En Progreso": "🏗️",
-  "Completado": "🏁",
-  "Planeando": "📝",
+  "In_Progress": "🏗️ En Progreso",
+  "Completed": "🏁 Completed",
+  "Planning": "📝 Planeando",
 };
+
 
 export const getSideBar = (subAccountId: string) => [
   {

@@ -31,7 +31,7 @@ const NavBar = async ({ children }: { children: ReactNode }) => {
         <SidebarProvider>
             <AppSidebar user={ user } orgName={ orgName } orgId={ orgId } orgLogo={ logo } orgEmail={ orgEmail } userName={ userName } userEmail={ userEmail } userAvatar={ userAvatar } />
             <SidebarInset>  
-                <header className='flex items-center gap-2 p-4'>
+                <header className='sticky top-0 flex items-center gap-2 p-4'>
                     <div className='p-2 flex w-full rounded-md items-center justify-between shadow-lg top-0 right-0 left-0 z-10 bg-secondary' >
                         <aside className='flex items-center gap-2'>
                             <SidebarTrigger/>

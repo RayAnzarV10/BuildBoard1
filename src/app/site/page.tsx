@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { pricingCards, projects, statusIcons } from "@/lib/constants";
+import { pricingCards, projects } from "@/lib/constants";
 import { ProjectCard } from "@/components/ui/card_buildboard";
 import { Check } from "lucide-react";
 import Link from "next/link";
@@ -26,7 +26,10 @@ export default function Home() {
         {/* Projects Grid with improved spacing */}
         <div className="flex justify-center flex-wrap gap-4 mt-12 w-full max-w-6xl mx-auto">
           {projects.slice(0, 2).map((project) => (
-            <ProjectCard key={project.id} project={project} statusIcons={statusIcons} className="shadow-xl hover:scale-105 transition-transform duration-200"/>
+            <ProjectCard 
+              key={project.number} 
+              project={project} 
+              className="shadow-xl w-[350px] hover:scale-105 transition-transform duration-200"/>
           ))}
         </div>
       </section>
