@@ -10,13 +10,13 @@ export const ProjectCard = ({ project, className }: { project: any, className?: 
   return (
     <Card className={clsx("max-h-[415px]", className)} key={project.name}>
       {/* Encabezado */}
-      <CardHeader className="m-1">
-        <div className="flex justify-between">
+      <CardHeader>
+        <div className="flex flex-1 justify-between">
           <Badge
             className={clsx({
-              'bg-green-100 text-green-600 font-bold': project.status === 'Completed',
-              'bg-blue-100 text-blue-600 font-bold': project.status === 'In_Progress',
-              'bg-yellow-100 text-yellow-600 font-bold': project.status === 'Planning',
+              'bg-green-100 text-green-600 font-semibold': project.status === 'Completed',
+              'bg-blue-100 text-blue-600 font-semibold': project.status === 'In_Progress',
+              'bg-yellow-100 text-yellow-600 semifont-bold': project.status === 'Planning',
             })}
           >
             {statusIcons[project.status as keyof typeof statusIcons]}
@@ -28,7 +28,7 @@ export const ProjectCard = ({ project, className }: { project: any, className?: 
       </CardHeader>
 
       {/* Contenido */}
-      <CardContent className="flex flex-col mt-[-10] space-y-4">
+      <CardContent className="flex flex-col mt-[-10] space-y-3">
           <div className="flex items-center gap-1" >
             <MapPin size={16} className="shrink-0" />
             <span className='truncate'>{project.location}</span>
@@ -57,22 +57,22 @@ export const ProjectCard = ({ project, className }: { project: any, className?: 
       <CardFooter className="m-1 mt-[-10]">
         <div className="border-t w-full flex pt-2">
           <div className="flex-col w-1/2">
-            <p>Ingresos Totales</p>
+            <p className='text-sm font-semibold'>Ingresos Totales</p>
             <span
-              className="text-green-600 font-semibold"
+              className="text-green-600 font-semibold text-sm"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
               {project.income
-                ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                project.income
+              ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
+              project.income
               )
-                : '$0'}
+              : '$0'}
             </span>
           </div>
           <div className="flex-col w-1/2">
-            <p>Gastos Totales</p>
+            <p className='text-sm font-semibold'>Gastos Totales</p>
             <span
-              className="text-red-600 font-semibold"
+              className="text-red-600 font-semibold text-sm"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
               {project.expense 
