@@ -1,5 +1,5 @@
-import Projects from "@/components/dashboard/search-projects";
 import NavBar from "@/components/site/navigation/navBar";
+import VerticalProjects from "./vertical-projects";
 
 export default async function ProjectDetails({ 
   params 
@@ -11,8 +11,9 @@ export default async function ProjectDetails({
 
   return (
     <NavBar>
-      <Projects orgId={orgId} />
+      <main className="flex-1 m-4 mt-[-2] space-y-4 rounded-md">
+        <VerticalProjects orgId={orgId} />
+      </main>
     </NavBar>
-  
   );
 }

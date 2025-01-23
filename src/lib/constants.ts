@@ -124,7 +124,7 @@ export const projects = [
 
 export const statusIcons = {
   "In_Progress": "🏗️ En Progreso",
-  "Completed": "🏁 Completed",
+  "Completed": "🏁 Completado",
   "Planning": "📝 Planeando",
 };
 

@@ -10,7 +10,7 @@ import Link from "next/link"
 import { getProjects } from "@/lib/queries"
 import { ProjectStatus } from "@prisma/client"
 
-export default function Projects({ orgId }: { orgId: string }) {
+export default function Projects({ orgId, className }: { orgId: string, className?: string }) {
   const [projects, setProjects] = useState<Array<{
     number: number;
     status: ProjectStatus;
@@ -75,7 +75,7 @@ export default function Projects({ orgId }: { orgId: string }) {
   }
 
   return (
-    <Card className="bg-primary-foreground shadow-lg dark:bg-card w-full">
+    <Card className={`bg-primary-foreground shadow-lg dark:bg-card w-full ${className}`}>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
       </CardHeader>
