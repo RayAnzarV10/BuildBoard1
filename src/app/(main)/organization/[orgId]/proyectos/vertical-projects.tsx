@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { ProjectCard } from "@/components/ui/card_buildboard"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { getProjects } from "@/lib/queries"
 import { ProjectStatus } from "@prisma/client"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -12,6 +12,10 @@ import { Badge } from "@/components/ui/badge"
 import clsx from "clsx"
 import { statusIcons } from "@/lib/constants"
 import { Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Separator } from "@/components/ui/separator"
+import GoogleMapsPin from "@/components/global/GoogleMap"
 
 interface Project {
   number: number
@@ -63,10 +67,27 @@ const ProjectDetails = ({ project }: ProjectDetailsProps) => {
 				</div>
 			</div>
       <div className="space-y-4">
-        <div>
-          <h4 className="font-semibold">Descripción</h4>
-          <p>{project.description}</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-semibold">Descripción</h4>
+            <p className="text-muted-foreground">{project.description}</p>
+          </div>
+          <div>
+            <h4 className="font-semibold truncate">Fecha de Entrega</h4>
+            <p className="text-muted-foreground">
+              {new Date(project.est_completion).toLocaleDateString("es-MX", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
         </div>
+        <Separator />
+          <div className="items-center">
+            <GoogleMapsPin latitude={18.592303475108622} longitude={-103.69230240413565} />
+          </div>
+        <Separator />
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h4 className="font-semibold">Presupuesto</h4>
@@ -75,10 +96,6 @@ const ProjectDetails = ({ project }: ProjectDetailsProps) => {
           <div>
             <h4 className="font-semibold">Ubicación</h4>
             <p>{project.location}</p>
-          </div>
-          <div>
-            <h4 className="font-semibold">Fecha estimada de finalización</h4>
-            <p>{new Date(project.est_completion).toLocaleDateString()}</p>
           </div>
         </div>
       </div>
@@ -149,10 +166,11 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
   }
 
   return (
-    <main className="flex-grow flex items-center grid grid-cols-2 gap-4">
-      <Card className={`bg-primary-foreground shadow-lg dark:bg-card w-full h-[calc(100vh-6.2rem)] flex flex-col ${className}`}>
-        <CardHeader className="flex flex-row items-center justify-between">
+    <div className="flex-grow flex items-center grid grid-cols-2 gap-4">
+      <Card className={`bg-primary-foreground shadow-xl dark:bg-card w-full h-[calc(100vh-6.2rem)] flex flex-col ${className}`}>
+        <CardHeader className="flex flex-col">
           <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
+          <CardDescription className="truncate">Explora tus proyectos y sus detalles</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 flex-grow flex flex-col overflow-hidden">
           {loading ? (
@@ -226,14 +244,31 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
           )}
         </CardContent>
       </Card>
-      <Card className="bg-primary-foreground shadow-lg dark:bg-card w-full h-full">
+      <Card className="bg-primary-foreground shadow-xl dark:bg-card flex flex-col h-full">
         <CardHeader>
 					<CardTitle className="text-2xl font-bold truncate">Detalles del Proyecto</CardTitle>
         </CardHeader>
         <CardContent>
           <ProjectDetails project={selectedProject} />
         </CardContent>
+        <CardFooter className="mt-auto">
+          {selectedProject? (
+            <Link 
+              href={`/organization/${orgId}/proyectos/${selectedProject.id}`} 
+              className="w-full"
+            >
+              <Button 
+                variant="secondary" 
+                className="bg-primary w-full text-white hover:bg-primary/70"
+              >
+                Editar Proyecto
+              </Button>
+            </Link>
+          ) : (
+            ''
+          )}
+        </CardFooter>
       </Card>
-    </main>
+    </div>
   )
 }
