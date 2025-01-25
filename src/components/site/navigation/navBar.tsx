@@ -1,6 +1,7 @@
 import { ModeToggle } from '@/components/global/mode-toggle'
 import { Notifications } from '@/components/sidebar/notifications'
 import { AppSidebar } from '@/components/sidebar/sidebar'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { getAuthUserDetails, getNotificationAndUser } from '@/lib/queries'
 import { UserButton } from '@clerk/nextjs'
@@ -35,12 +36,9 @@ const NavBar = async ({ children }: { children: ReactNode }) => {
           <div className='p-2 flex w-full rounded-md items-center justify-between shadow-lg top-0 right-0 left-0 z-10 bg-secondary' >
             <aside className='flex items-center gap-2'>
               <SidebarTrigger/>
-              <Image 
-                src={logo} 
-                alt='logo' 
-                width={35} 
-                height={35}
-              />
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage src={ logo } />
+              </Avatar>
               <span className='text-xl font-bold p-1'>
                 {orgName}
               </span>
