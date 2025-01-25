@@ -59,7 +59,7 @@ const Page = async ({
             BuildBoard.
           </span>
         </aside>
-        <div className='flex items-center justify-center'>
+        <div className='flex items-center justify-center gap-2'>
           <UserButton/>
           <ModeToggle/>
         </div>

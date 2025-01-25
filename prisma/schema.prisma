@@ -26,11 +26,9 @@ model Organization {
   phone                   String          
   address                 String          
   city                    String          
-  primary_color           String              @default("#FFFFFFF")
   zipCode                 String          
   state                   String          
   country                 String              
-  whiteLabel              Boolean             @default(true)
   users                   User[]          
   client                  Client[]
   addOns                  AddOns[]          
@@ -197,7 +195,8 @@ model Project {
   name                  String
   status                ProjectStatus
   location              String                @db.Text
-  est_completion        DateTime
+  det_location          String                @default("")
+  est_completion        DateTime    
   budget                Float
   description           String                @db.Text
   incomes               Income[]

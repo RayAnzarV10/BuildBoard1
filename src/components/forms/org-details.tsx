@@ -19,11 +19,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '../ui/input'
 import { Select } from '../ui/select'
 import { Separator } from '../ui/separator'
-import { Switch } from '../ui/switch'
 import { CollapsibleSelect, CollapsibleSelect2 } from './collapsible-select'
 import { deleteOrg, initUser, upsertOrg } from '@/lib/queries'
 import {v4} from 'uuid'
-import { HexColorPicker } from 'react-colorful'
 
 type Props = {
     data?: Partial <Organization>
@@ -34,7 +32,6 @@ const FormSchema = z.object({
     description: z.string().min(2, { message: 'La descripción de la empresa debe tener al menos 2 caracteres' }),
     email: z.string().email({ message: 'El correo no es válido' }),
     phone: z.string().min(1, { message: 'El teléfono no es válido' }),
-    whiteLabel: z.boolean(),
     address: z.string().min(1, { message: 'La dirección no es válida' }),
     city: z.string().min(1, { message: 'La ciudad no es válida' }),
     zipCode: z.string().min(1, { message: 'El código postal no es válido' }),
@@ -47,7 +44,6 @@ const FormSchema = z.object({
     pains: z.string().min(1, { message: 'Ingresa por lo menos una problemática' }),
     paymentMethods: z.string().min(1, { message: 'Selecciona al menos un método de pago' }),
     expectations: z.string().min(1, { message: 'Ingresa al menos una expectativa' }),
-    primary_color: z.string().default('#4F46E5'),
 
 })
 
@@ -63,7 +59,6 @@ const OrgDetails = ({data}:Props) => {
       description: data?.description,
       email: data?.email,
       phone: data?.phone,
-      whiteLabel: data?.whiteLabel || false,
       address: data?.address,
       city: data?.city,
       zipCode: data?.zipCode,
@@ -76,7 +71,6 @@ const OrgDetails = ({data}:Props) => {
       pains: data?.pains,
       paymentMethods: data?.paymentMethods,
       expectations: data?.expectations,
-      primary_color: data?.primary_color || '#4F46E5',
     }
   })
   const isLoading = form.formState.isSubmitting
@@ -138,14 +132,12 @@ const OrgDetails = ({data}:Props) => {
           country: values.country,
           name: values.name,
           state: values.state,
-          whiteLabel: values.whiteLabel,
           zipCode: values.zipCode,
           createdAt: new Date(),
           updatedAt: new Date(),
           email: values.email,
           connectAccountId: '',
           description: values.description,
-          primary_color: values.primary_color,
           teammembers: values.teammembers,
           financingType: values.financingType,
           productsAndServices: values.productsAndServices,
@@ -247,7 +239,6 @@ const OrgDetails = ({data}:Props) => {
                     </FormItem>
                   )}
                 />
-                {/* Cambia el email para que se pueda poner uno distinto */}
                 <FormField
                   control={form.control}
                   name="email"
@@ -269,26 +260,26 @@ const OrgDetails = ({data}:Props) => {
                 />
               </div>
               <div className="flex md:flex-row gap-4">
-              <FormField
-                disabled={isLoading}
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Teléfono</FormLabel>
-                    <PhoneInput
-                      specialLabel=''
-                      country={"mx"}
-                      value={field.value || ''} 
-                      inputClass="!w-full !bg-background !h-10 !rounded-md !border-input !shadow-sm !border"
-                      containerClass="react-tel-input"
-                      buttonClass="!bg-white"
-                      onChange={field.onChange} // Direct field.onChange instead of setState
-                      disabled={isLoading}
-                    />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  disabled={isLoading}
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Teléfono</FormLabel>
+                      <PhoneInput
+                        specialLabel=''
+                        country={"mx"}
+                        value={field.value || ''} 
+                        inputClass="!w-full !bg-background !h-10 !rounded-md !border-input !shadow-sm !border"
+                        containerClass="react-tel-input"
+                        buttonClass="!bg-white"
+                        onChange={field.onChange} // Direct field.onChange instead of setState
+                        disabled={isLoading}
+                      />
+                    </FormItem>
+                  )}
+                />
               </div>
               <FormField
                 disabled={isLoading}
@@ -460,164 +451,88 @@ const OrgDetails = ({data}:Props) => {
                   )}
                 />
               </div>
-                <FormField
-                  disabled={isLoading}
-                  control={form.control}
-                  name="productsAndServices"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>¿Qué productos y/o servicios ofrecen?</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Diseño de interiores, construcción ..."
-                          value={field.value || ''}
-                          onChange={field.onChange}
-                          disabled={isLoading}
-                          />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                  />
-                  <FormField
-                    disabled={isLoading}
-                    control={form.control}
-                    name="pains"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>¿Cuáles son los principales retos a los que se enfrentan?</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Retraso en pagos, falta de liquidez ..."
-                            value={field.value || ''}
-                            onChange={field.onChange}
-                            disabled={isLoading}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    disabled={isLoading}
-                    control={form.control}
-                    name="paymentMethods"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>¿Qué métodos de pago aceptan actualmente?</FormLabel>
-                        <CollapsibleSelect2
-                          value={field.value || ''}
-                          onChange={field.onChange}
-                          disabled={isLoading}
-                          name='paymentMethods'
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="productsAndServices"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>¿Qué productos y/o servicios ofrecen?</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Diseño de interiores, construcción ..."
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        disabled={isLoading}
                         />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    disabled={isLoading}
-                    control={form.control}
-                    name="expectations"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>¿Qué esperas de una plataforma de administración como <a className='font-bold'>BuildBoard</a>?</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Eliminar tareas tediosas, tener todo más organizado ..."
-                            value={field.value || ''}
-                            onChange={field.onChange}
-                            disabled={isLoading}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                <h3 className="text-xl font-bold pt-6">Configuración Avanzada</h3>
-                <Separator />
-                <FormField
-                  disabled={isLoading}
-                  control={form.control}
-                  name="whiteLabel"
-                  render={({ field }) => {
-                    return (
-                      <FormItem className="flex flex-row bg-background items-center shadow-sm justify-between rounded-lg border gap-4 p-4">
-                        <div>
-                          <FormLabel>Modo marca blanca</FormLabel>
-                          <FormDescription className='text-'>
-                            Activar el modo de marca blanca mostrará el logotipo de tu empresa
-                            en todas las subcuentas. Puedes cambiar esta
-                            funcionalidad a través de la configuración de subcuentas.
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isLoading}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )
-                  }}
-                />
-                <Separator />
-                <FormField
-                  disabled={isLoading}
-                  control={form.control}
-                  name="primary_color"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Color principal</FormLabel>
-                      <div className='flex justify-start gap-4'>
-                        <div className="relative">
-                          <HexColorPicker 
-                            color={field.value || '#4F46E5'} 
-                            onChange={(color) => {
-                              field.onChange(color);
-                            }}
-                            className='shadow-sm'
-                          />
-                        </div>
-                        <div className='flex flex-col pr-4'>
-                          <FormDescription style={{color: field.value || '#4F46E5'}} className='text-lg font-bold'>
-                            Este color se usará como el color principal de tu página
-                          </FormDescription>
-                          <FormDescription style={{color: field.value || '#4F46E5'}} className='text-md font-bold'>
-                            No te preocupes, si no te gusta lo puedes cambiar después
-                          </FormDescription>
-                          <FormDescription style={{color: field.value || '#4F46E5'}} className='text-md font-bold'>
-                            No se utilizará para texto
-                          </FormDescription>
-                        </div>
-                      </div>
-                      <div className='flex items-center justify-between gap-2'>
-                        <div 
-                          className='w-8 h-8 rounded-full bg-background shadow-inner'
-                          style={{ backgroundColor: field.value || '#4F46E5' }}
-                        />
-                        <Input
-                          type='text'
-                          value={field.value || '#4F46E5'}
-                          onChange={(e) => field.onChange(e.target.value)}
-                          disabled={isLoading}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Separator />
-                {/* <ColorPicker/> */}
-                <Button
-                  type="submit"
-                  className='shadow-sm'
-                  disabled={isLoading}
-                >
-                  {isLoading ? <Loading /> : 'Guardar y continuar'}
-                </Button>
-              </form>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="pains"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>¿Cuáles son los principales retos a los que se enfrentan?</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Retraso en pagos, falta de liquidez ..."
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="paymentMethods"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>¿Qué métodos de pago aceptan actualmente?</FormLabel>
+                    <CollapsibleSelect2
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      disabled={isLoading}
+                      name='paymentMethods'
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="expectations"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>¿Qué esperas de una plataforma de administración como <a className='font-bold'>BuildBoard</a>?</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Eliminar tareas tediosas, tener todo más organizado ..."
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />        
+              <Button
+                type="submit"
+                className='shadow-sm'
+                disabled={isLoading}
+              >
+                {isLoading ? <Loading /> : 'Guardar y continuar'}
+              </Button>
+            </form>
           </Form>
           {data?.id && (
             <div className='flex flex-row items-center justify-between rounded-lg border border-destructive gap-4 p-4 mt-4'>

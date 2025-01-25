@@ -19,6 +19,7 @@ const GoogleMapsPin = ({ latitude, longitude } : {latitude: number, longitude: n
         mapContainerStyle={{
           width: '100%',
           height: '300px',
+          borderRadius: '0.375rem'
         }}
         center={center}
         zoom={18}

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 import GoogleMapsPin from "@/components/global/GoogleMap"
+import CreateProject from "@/components/forms/new-project"
 
 interface Project {
   number: number
@@ -87,15 +88,22 @@ const ProjectDetails = ({ project }: ProjectDetailsProps) => {
           <div className="items-center">
             <GoogleMapsPin latitude={18.592303475108622} longitude={-103.69230240413565} />
           </div>
+          <div>
+            <h4 className="font-semibold">Ubicación</h4>
+            <a 
+              href={`https://www.google.com/maps?q=${18.592303475108622},${-103.69230240413565}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              {project.location}
+            </a>
+          </div>
         <Separator />
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h4 className="font-semibold">Presupuesto</h4>
             <p>${project.budget.toLocaleString()}</p>
-          </div>
-          <div>
-            <h4 className="font-semibold">Ubicación</h4>
-            <p>{project.location}</p>
           </div>
         </div>
       </div>
@@ -169,7 +177,10 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
     <div className="flex-grow flex items-center grid grid-cols-2 gap-4">
       <Card className={`bg-primary-foreground shadow-xl dark:bg-card w-full h-[calc(100vh-6.2rem)] flex flex-col ${className}`}>
         <CardHeader className="flex flex-col">
-          <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
+          <div className="flex flex-row items-end justify-between">
+            <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
+            <CreateProject />
+          </div>
           <CardDescription className="truncate">Explora tus proyectos y sus detalles</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 flex-grow flex flex-col overflow-hidden">
