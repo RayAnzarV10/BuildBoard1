@@ -1,12 +1,10 @@
 "use client"
 
-import { MoreHorizontal } from "lucide-react"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 
 export function NavUser({

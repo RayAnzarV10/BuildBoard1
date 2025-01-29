@@ -3,8 +3,8 @@
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { db } from './db'
 import { redirect } from 'next/navigation'
-import { Organization, Plan, ProjectStatus, User } from '@prisma/client'
-import { v4 } from 'uuid'
+import { Organization, Plan, Project, ProjectStatus, User } from '@prisma/client'
+import { number } from 'zod'
 
 export const getAuthUserDetails = async () => {
   const user = await currentUser()
@@ -132,7 +132,7 @@ export const verifyAndAcceptInvitation = async () => {
       //Si esto no funciona, intenta quitar el primer await
       await (await clerkClient()).users.updateUserMetadata(user.id, {
         privateMetadata: {
-          role: userDetails.role || 'SUBACCOUNT_USER',
+          role: userDetails.role || 'ORG_USER',
         },
       })
 
@@ -182,13 +182,13 @@ export const initUser = async (newUser: Partial<User>) => {
       email: user.emailAddresses[0].emailAddress,
       name: `${user.firstName} ${user.lastName}`,
       avatarUrl: user.imageUrl,
-      role: newUser.role || 'SUBACCOUNT_USER',
+      role: newUser.role || 'ORG_USER',
     }
   })
 
   await (await clerkClient()).users.updateUserMetadata(user.id, {
     privateMetadata: {
-      role: newUser.role || 'SUBACCOUNT_USER',
+      role: newUser.role || 'ORG_USER',
     },
   })
   return userData
@@ -210,6 +210,35 @@ export const upsertOrg = async (organization: Organization, price?: Plan) => {
       }
     })
     return orgDetails
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const nextNumber = async (orgId: string) => {
+  const response = await db.project.findFirst({
+    where: { orgId },
+    orderBy: {
+      number: 'desc',
+    },
+    select: { number: true },
+  });
+
+  return response ? response.number + 1 : 1;
+}
+
+export const upsertProject = async (project: Project) => {
+  try {
+    const response = await db.project.upsert({
+      where: {
+        id: project.id,
+      },
+      update: project,
+      create: {
+        ...project
+      }
+    })
+    return response
   } catch (error) {
     console.log(error)
   }

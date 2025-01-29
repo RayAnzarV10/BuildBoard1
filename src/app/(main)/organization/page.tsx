@@ -21,10 +21,7 @@ const Page = async ({
   const user = await getAuthUserDetails()
 
   if (orgId) {
-    if (user?.role === 'SUBACCOUNT_GUEST' || user?.role === 'SUBACCOUNT_USER') {
-      return redirect('/subaccount')
-    }
-    else if (user?.role === 'ORG_OWNER' || user?.role === 'ORG_ADMIN') {
+    if (user?.role === 'ORG_OWNER' || user?.role === 'ORG_ADMIN' || user?.role === 'ORG_USER') {
       if (plan) {
         return redirect(`/organization/${orgId}/billing?plan=${plan}`)
       }

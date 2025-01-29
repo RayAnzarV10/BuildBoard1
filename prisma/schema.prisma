@@ -133,8 +133,7 @@ model Subscription {
 enum Role {
   ORG_OWNER
   ORG_ADMIN
-  SUBACCOUNT_USER
-  SUBACCOUNT_GUEST
+  ORG_USER
 }
 
 model User {
@@ -144,7 +143,7 @@ model User {
   email               String              @unique
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
-  role                Role                @default(SUBACCOUNT_USER)
+  role                Role                @default(ORG_USER)
   orgId               String?
   org                 Organization?       @relation(fields: [orgId], references: [id], onDelete: Cascade)
   notification        Notification[]
@@ -174,7 +173,7 @@ model Invitation {
   orgId       String
   org         Organization          @relation(fields: [orgId], references: [id], onDelete: Cascade)
   status      InvitationStatus      @default(PENDING)
-  role        Role                  @default(SUBACCOUNT_USER)
+  role        Role                  @default(ORG_USER)
 
   @@index([orgId])
 }

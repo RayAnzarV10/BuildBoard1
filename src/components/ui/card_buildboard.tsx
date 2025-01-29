@@ -29,28 +29,28 @@ export const ProjectCard = ({ project, className }: { project: any, className?: 
 
       {/* Contenido */}
       <CardContent className="flex flex-col mt-[-10] space-y-3">
-          <div className="flex items-center gap-1" >
-            <MapPin size={16} className="shrink-0" />
-            <span className='truncate'>{project.location}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <CalendarDays size={16} className="shrink-0" />
-            <span className='truncate'>
-              {new Date(project.est_completion).toLocaleDateString("es-MX", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </div>
-          <div className="flex flex-row items-center gap-1">
-            <Wallet size={16} className="shrink-0" style={{ marginTop: '0.1em' }}/>
-            <span className='truncate'>
-              {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                Number(project.budget)
-              )}
-            </span>
-          </div>
+        <div className="flex items-center gap-1" >
+          <MapPin size={16} className="shrink-0" />
+          <span className='truncate'>{project.location}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <CalendarDays size={16} className="shrink-0" />
+          <span className='truncate'>
+            {new Date(project.est_completion).toLocaleDateString("es-MX", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
+        </div>
+        <div className="flex flex-row items-center gap-1">
+          <Wallet size={16} className="shrink-0" style={{ marginTop: '0.1em' }}/>
+          <span className='truncate'>
+            {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
+              Number(project.budget)
+            )}
+          </span>
+        </div>
       </CardContent>
 
       {/* Footer */}

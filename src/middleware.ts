@@ -34,8 +34,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
   
   if (
-    url.pathname.startsWith('/organization') ||
-    url.pathname.startsWith('/subaccount')
+    url.pathname.startsWith('/organization')
   ) {
     return NextResponse.rewrite(new URL(`${pathWithSearchParams}`, req.url))
   }

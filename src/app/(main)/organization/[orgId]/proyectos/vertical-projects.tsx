@@ -179,7 +179,11 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
         <CardHeader className="flex flex-col">
           <div className="flex flex-row items-end justify-between">
             <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
-            <CreateProject />
+            <Link href={`/organization/${orgId}/proyectos/nuevo`}>
+                <Button className="text-xs h-7 px-2">
+                  Nuevo Proyecto
+                </Button>
+            </Link>
           </div>
           <CardDescription className="truncate">Explora tus proyectos y sus detalles</CardDescription>
         </CardHeader>

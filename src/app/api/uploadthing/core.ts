@@ -12,11 +12,6 @@ const authenticateUser = async () => {
 }
 
 export const ourFileRouter = {
-  subAccountLogo: f({ image: { maxFileSize: '4MB', maxFileCount: 1 } })
-    .middleware(authenticateUser)
-    .onUploadComplete(async ({ metadata }) => {
-      console.log('Upload complete for userId:', metadata.userId)
-    }),
   avatar: f({ image: { maxFileSize: '4MB', maxFileCount: 1 } })
     .middleware(authenticateUser)
     .onUploadComplete(async ({ metadata }) => {

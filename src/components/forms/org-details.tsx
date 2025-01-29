@@ -146,7 +146,7 @@ const OrgDetails = ({data}:Props) => {
           expectations: values.expectations,
         })
         toast({
-          title: 'Created Organization',
+          title: 'Organización creada!',
         })
         if (data?.id) return router.refresh()
           if (response) {
@@ -170,7 +170,7 @@ const OrgDetails = ({data}:Props) => {
       const response = await deleteOrg(data.id);
       toast({
         title: 'Deleted Organization',
-        description: 'Deleted your organization and all subaccounts',
+        description: 'Deleted your organization successfully',
       });
       router.refresh();
     } catch (error) {

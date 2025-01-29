@@ -57,8 +57,8 @@ const FileUpload = ({apiEndpoint, onChange, value}: Props) => {
             onClientUploadComplete={(res)=>{
                 onChange(res?.[0].url)
                 toast({
-                    title: "Uh oh! Something went wrong.",
-                    description: "There was a problem with your request.",
+                    title: "Logo subido!",
+                    description: "Tu logo ha sido subido exitosamente",
                   })
             }}
             onUploadError={(error: Error) => {
