@@ -2,20 +2,16 @@
 
 import React, { useEffect } from 'react'
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { z } from 'zod'
 import { Project, ProjectStatus } from '@prisma/client'
-import { Description } from '@radix-ui/react-toast'
 import { useToast } from '@/hooks/use-toast'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { nextNumber, upsertProject } from '@/lib/queries'
 import { v4 } from 'uuid'
 import { useRouter } from 'next/navigation'
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
-import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import LocationPicker from '../global/location-picker'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -26,6 +22,7 @@ import { es } from 'date-fns/locale/es'
 import { CalendarIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Loading from '../global/loading'
+import { Separator } from '../ui/separator'
 
 type Props = {
   data?: Partial <Project>
@@ -103,7 +100,7 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
       console.log(error)
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: 'Error!',
         description: 'Ha ocurrido un error al crear el proyecto',
       })
     }
@@ -112,9 +109,10 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
   return (
     <Card className='bg-primary-foreground shadow-xl dark:bg-card'>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className='font-bold'>
           Crear Proyecto
         </CardTitle>
+        <CardDescription>Puedes editar estos datos más adelante</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -142,78 +140,55 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
               )}
             />
             
-            <FormField
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descripción del Proyecto</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Restaurante a la orilla del mar'
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            {/* <FormField
-              control={form.control}
-              name='status'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estatus del Proyecto</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    value={field.value || ''}
-                    disabled={isLoading}
-                  >
+            <div className='grid grid-cols-2 gap-4'>
+              <FormField
+                control={form.control}
+                name='description'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descripción del Proyecto</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una opción" />
-                      </SelectTrigger>
+                      <Input
+                        placeholder='Restaurante a la orilla del mar'
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        disabled={isLoading}
+                      />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Planning">Planeando</SelectItem>
-                      <SelectItem value="In_Progress">En Progreso</SelectItem>
-                      <SelectItem value="Completed">Completado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='status'
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Estatus del Proyecto</FormLabel>
-                  <FormControl>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value || ''}
-                      disabled={isLoading}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una opción" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Planning">Planeando</SelectItem>
-                        <SelectItem value="In_Progress">En Progreso</SelectItem>
-                        <SelectItem value="Completed">Completado</SelectItem>
-                      </SelectContent>    
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='status'
+                render={({field}) => (
+                  <FormItem>
+                    <FormLabel>Estatus del Proyecto</FormLabel>
+                    <FormControl>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value || ''}
+                        disabled={isLoading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona una opción" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Planning">Planeando</SelectItem>
+                          <SelectItem value="In_Progress">En Progreso</SelectItem>
+                          <SelectItem value="Completed">Completado</SelectItem>
+                        </SelectContent>    
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
             
+            <Separator />
+
             <FormField
               control={form.control}
               name='det_location'
@@ -221,25 +196,12 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
                 <FormItem>
                   <FormLabel>Ubicación</FormLabel>
                   <FormControl>
-                    <LocationPicker field={field} isLoading={isLoading} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='location'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Ingresa el lugar'
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                      disabled={isLoading}
+                    <LocationPicker 
+                      field={field} 
+                      isLoading={isLoading}
+                      onAddressChange={(address) => {
+                        form.setValue('location', address)
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -247,66 +209,71 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name='est_completion'
-              render={({ field }) => (
-                <FormItem className='flex flex-col'>
-                  <FormLabel>Fecha estimada de finalización</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                          "w-[240px] pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                          format(field.value, "PPP", { locale: es })
-                          ) : (
-                          <span>Selecciona una fecha</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value || ''}
-                        onSelect={field.onChange}
-                        initialFocus
+            <Separator />
+
+            <div className='grid grid-cols-2 gap-4'>
+              <FormField
+                control={form.control}
+                name='est_completion'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fecha estimada de finalización</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                            format(field.value, "PPP", { locale: es })
+                            ) : (
+                            <span>Selecciona una fecha</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="center">
+                        <Calendar
+                          mode="single"
+                          selected={field.value || ''}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name='budget'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Presupuesto del Proyecto</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Ingresa una cantidad sin comas ni signos Ej. 1000000'
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        disabled={isLoading}
                       />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormDescription>
+                      La cantidad debe ser en pesos mexicanos
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             
-            <FormField
-              control={form.control}
-              name='budget'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Presupuesto del Proyecto</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Ingresa una cantidad sin comas ni signos Ej. 1000000'
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    La cantidad debe ser en pesos mexicanos
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <Button
                 type="submit"
                 className='shadow-sm'
