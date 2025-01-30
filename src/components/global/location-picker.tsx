@@ -2,17 +2,29 @@ import React, { useState } from 'react'
 import { Input } from '../ui/input'
 import { GoogleMap, LoadScript, Marker, Autocomplete } from '@react-google-maps/api'
 
-const LocationPicker = ({field, isLoading} : {field:any, isLoading:boolean}) => {
-  const [location, setLocation] = useState<{ lat: number, lng: number } | null>(null)
+interface LocationPickerProps {
+  field: {
+    onChange: (value: { lat: number; lng: number } | null) => void;
+    value: { lat: number; lng: number } | null;
+  };
+  isLoading: boolean;
+}
+
+const LocationPicker = ({ field, isLoading }: LocationPickerProps) => {
+  const [searchText, setSearchText] = useState<string>('')
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(field.value)
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null)
 
   const handlePlaceSelect = () => {
     if (autocomplete) {
       const place = autocomplete.getPlace()
       if (place.geometry && place.geometry.location) {
-        const lat = place.geometry.location.lat()
-        const lng = place.geometry.location.lng()
-        setLocation({ lat, lng })
+        const newLocation = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
+        }
+        setLocation(newLocation)
+        field.onChange(newLocation)
       }
     }
   }
@@ -50,6 +62,7 @@ const LocationPicker = ({field, isLoading} : {field:any, isLoading:boolean}) => 
                     lng: e.latLng.lng()
                   }
                   setLocation(newLocation)
+                  field.onChange(newLocation)
                 }
               }}
             />
@@ -59,13 +72,13 @@ const LocationPicker = ({field, isLoading} : {field:any, isLoading:boolean}) => 
           <Autocomplete
             onLoad={(autocomplete) => setAutocomplete(autocomplete)}
             onPlaceChanged={handlePlaceSelect}
-            >
+          >
             <Input 
               placeholder="Buscar dirección" 
-              value={field.value || ''}
-              onChange={field.onChange}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
               disabled={isLoading}
-              />
+            />
           </Autocomplete>
         </div>
       </LoadScript>

@@ -29,12 +29,17 @@ interface Project {
   createdAt: Date
   updatedAt: Date
   location: string
+  det_location: {
+    lat: number;
+    lng: number;
+  }
   budget: number
 }
 
 interface ProjectDetailsProps {
   project: Project | null
 }
+
 
 const ProjectDetails = ({ project }: ProjectDetailsProps) => {
   if (!project) return (
@@ -71,7 +76,7 @@ const ProjectDetails = ({ project }: ProjectDetailsProps) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h4 className="font-semibold">Descripción</h4>
-            <p className="text-muted-foreground">{project.description}</p>
+            <p className="text-muted-foreground truncate">{project.description}</p>
           </div>
           <div>
             <h4 className="font-semibold truncate">Fecha de Entrega</h4>
@@ -86,12 +91,12 @@ const ProjectDetails = ({ project }: ProjectDetailsProps) => {
         </div>
         <Separator />
           <div className="items-center">
-            <GoogleMapsPin latitude={18.592303475108622} longitude={-103.69230240413565} />
+            <GoogleMapsPin latitude={project.det_location.lat} longitude={project.det_location.lng} />
           </div>
           <div>
             <h4 className="font-semibold">Ubicación</h4>
             <a 
-              href={`https://www.google.com/maps?q=${18.592303475108622},${-103.69230240413565}`}
+              href={`https://www.google.com/maps?q=${project.det_location.lat},${project.det_location.lng}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"
@@ -128,7 +133,11 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
     const fetchProjects = async () => {
       try {
         const data = await getProjects(orgId)
-        setProjects(data)
+        const parsedProjects = data.map(project => ({
+          ...project,
+          det_location: project.det_location as { lat: number; lng: number }
+        }))
+        setProjects(parsedProjects)
       } catch (error) {
         console.error("Error fetching projects:", error)
       } finally {
@@ -174,7 +183,7 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
   }
 
   return (
-    <div className="flex-grow flex items-center grid grid-cols-2 gap-4">
+    <div className="flex-grow flex items-center grid grid-cols-[40%_60%] xs:grid-cols-1 mr-4 gap-4">
       <Card className={`bg-primary-foreground shadow-xl dark:bg-card w-full h-[calc(100vh-6.2rem)] flex flex-col ${className}`}>
         <CardHeader className="flex flex-col">
           <div className="flex flex-row items-end justify-between">

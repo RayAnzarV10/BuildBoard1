@@ -35,7 +35,10 @@ const FormSchema = z.object({
   name: z.string().min(2, { message: 'El nombre del proyecto debe tener al menos 2 caracteres' }),
   status: z.nativeEnum(ProjectStatus),
   location: z.string().min(1, { message: 'La ubicación es requerida' }),
-  det_location: z.string().min(1, { message: 'La ubicación detallada es requerida' }),
+  det_location: z.object({
+    lat: z.number().or(z.string()).pipe(z.coerce.number()),
+    lng: z.number().or(z.string()).pipe(z.coerce.number())
+  }, { required_error: 'La ubicación detallada es requerida' }),
   est_completion: z.date({ message: 'La fecha de finalización es requerida' }),
   budget: z.coerce.number({ message: 'Ingresa un número correcto' }),
   description: z.string().min(1, { message: 'La descripción es requerida' }),
@@ -50,8 +53,8 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
     defaultValues: {
       name: data?.name,
       status: data?.status,
-      location: data?.location || '',
-      det_location: data?.det_location,
+      location: data?.location,
+      det_location: data?.det_location as { lat: number, lng: number },
       est_completion: data?.est_completion,
       budget: data?.budget,
       description: data?.description,
@@ -61,7 +64,11 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
 
   useEffect(() => {
     if (data?.id) {
-      form.reset(data)
+      const formData = {
+        ...data,
+        det_location: data.det_location as { lat: number; lng: number }
+      }
+      form.reset(formData)
     }
   }, [data])
   
@@ -300,9 +307,6 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
                 </FormItem>
               )}
             />
-          
-            <Separator />
-            
             <Button
                 type="submit"
                 className='shadow-sm'

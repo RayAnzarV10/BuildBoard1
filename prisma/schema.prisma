@@ -194,7 +194,7 @@ model Project {
   name                  String
   status                ProjectStatus
   location              String                @db.Text
-  det_location          String                @default("")
+  det_location          Json?                
   est_completion        DateTime    
   budget                Float
   description           String                @db.Text
