@@ -92,7 +92,7 @@ El sistema maneja diferentes entidades para organizar la información:
 
 ## 📞 Contacto
 - Email: [rayfcoanzar@gmail.com](mailto:rayfcoanzar@gmail.com)
-- LinkedIn: [Raymundo Francisco Anzar Villalobos](www.linkedin.com/in/raymundo-francisco-anzar-villalobos)
+- LinkedIn: [Raymundo Francisco Anzar Villalobos](https://www.linkedin.com/in/raymundo-francisco-anzar-villalobos)
 
 ---
 *Proyecto en desarrollo activo - Las funcionalidades pueden ser expandidas o modificadas.*
