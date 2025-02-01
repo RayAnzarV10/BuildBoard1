@@ -1,98 +1,57 @@
 # BuildBoard
+### La solución integral para PyMEs de construcción y diseño de interiores
 
-Este es un software de gestión especializado para PyMEs mexicanas en el sector de construcción y diseño de interiores, permitiendo una administración eficiente de proyectos.
+BuildBoard es un software diseñado específicamente para simplificar la gestión administrativa y financiera de pequeñas y medianas empresas mexicanas en el sector de la construcción y diseño de interiores. Entendemos que los fundadores y equipos de estas empresas son expertos en su campo técnico, no en administración - por eso BuildBoard hace el trabajo pesado por ti.
 
-## 🚀 Características
+## ✨ ¿Por qué BuildBoard?
 
-### Gestión de Proyectos
-- Seguimiento de estado de proyectos
-- Control de presupuestos
-- Fechas estimadas de finalización
-- Localización geográfica con Google Maps
-- Descripción detallada de proyectos
+- **Simple pero Poderoso**: Interfaz intuitiva diseñada para usuarios no técnicos
+- **Automatización Inteligente**: Reduce tareas administrativas tediosas
+- **Análisis Financiero**: Obtén insights valiosos sin ser experto en finanzas
+- **Todo en Un Lugar**: Gestiona proyectos, finanzas y documentos en una sola plataforma
+- **Ahorra Tiempo**: Automatiza tareas repetitivas y céntrate en hacer crecer tu negocio
+- **Mejor Control**: Ten una visión clara del estado de tus proyectos y finanzas en tiempo real
 
-### 📍 Geolocalización
-- Integración completa con Google Maps
-- Autocompletado en búsqueda de direcciones
-- Vista satelital de ubicaciones
-- Marcadores interactivos y arrastrables
+## 🚀 Características Principales
 
-### 🏢 Organización
-- Gestión por organizaciones
-- Numeración automática de proyectos
-- Sistema de estados para seguimiento
+### 📊 Gestión de Proyectos
+- Dashboard intuitivo para seguimiento de proyectos
+- Estados simplificados: Planeando → En Progreso → Completado
+- Integración con Google Maps
+- Almacenamiento de documentos del proyecto (planos, contratos, etc.)
 
-## 🛠️ Tecnologías
+### 💰 Control Financiero
+- Registro y seguimiento de ingresos y gastos
+- Estados financieros automáticos
+- Análisis de liquidez y flujo de efectivo
+- Alertas tempranas de problemas de liquidez
+- Reportes financieros automatizados
 
-### Frontend
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- Shadcn/ui
-- React Google Maps API
+### 📈 Análisis y Reportes
+- Dashboards automatizados
+- Análisis financiero básico
+- Reportes personalizados
+- Métricas clave de desempeño
 
-### Backend
-- Prisma ORM
-- Base de datos con soporte JSON
+## 🔜 Próximamente
 
-## 📋 Requisitos
-- Node.js
-- API Key de Google Maps
-- Variables de entorno:
-  ```
-  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
-  DATABASE_URL=
-  ```
+- Integración con el SAT
+- Conexión con cuentas bancarias
+- Inversiones automáticas de excedentes
+- Sistema CRM integrado
+- Generación automática de facturas CFDI
 
-## 🔧 Configuración
+## 🛡️ Seguridad y Privacidad
 
-1. Clonar el repositorio
-```bash
-git clone [URL_REPOSITORIO]
-```
-
-2. Instalar dependencias
-```bash
-npm install
-```
-
-3. Configurar variables de entorno
-```bash
-cp .env.example .env
-```
-
-4. Ejecutar migraciones
-```bash
-npx prisma migrate dev
-```
-
-5. Iniciar servidor de desarrollo
-```bash
-npm run dev
-```
-
-## 📝 Estructura de Datos
-
-El sistema maneja diferentes entidades para organizar la información:
-
-- Organizaciones
-- Proyectos
-- Presupuestos
-- Entre otros
-
-
-## 🤝 Contribución
-
-1. Fork del repositorio
-2. Crear rama para feature (`git checkout -b feature/NuevaCaracteristica`)
-3. Commit de cambios (`git commit -m 'Agregar nueva característica'`)
-4. Push a la rama (`git push origin feature/NuevaCaracteristica`)
-5. Crear Pull Request
-
-## 📞 Contacto
-- Email: [rayfcoanzar@gmail.com](mailto:rayfcoanzar@gmail.com)
-- LinkedIn: [Raymundo Francisco Anzar Villalobos](https://www.linkedin.com/in/raymundo-francisco-anzar-villalobos)
+- Almacenamiento seguro de documentos
+- Gestión de permisos por rol
+- Protección de datos sensibles
+- Cumplimiento con regulaciones mexicanas
 
 ---
-*Proyecto en desarrollo activo - Las funcionalidades pueden ser expandidas o modificadas.*
+
+¿Preguntas? ¿Sugerencias? [Contáctanos]
+
+*BuildBoard - Simplificando la gestión de tu empresa constructora*
+
+<sub>*Proyecto en desarrollo activo - Las funcionalidades pueden ser expandidas o modificadas.*</sub>
