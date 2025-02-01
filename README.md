@@ -58,4 +58,5 @@ BuildBoard es un software diseñado específicamente para simplificar la gestió
 
 --- 
 *BuildBoard - Simplificando la gestión de tu empresa constructora*
+
 <sub>*Proyecto en desarrollo activo - Las funcionalidades pueden ser expandidas o modificadas.*</sub>
