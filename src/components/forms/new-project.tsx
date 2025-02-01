@@ -8,7 +8,7 @@ import { Project, ProjectStatus } from '@prisma/client'
 import { useToast } from '@/hooks/use-toast'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { nextNumber, upsertProject } from '@/lib/queries'
+import { nextNumber, createProject } from '@/lib/queries'
 import { v4 } from 'uuid'
 import { useRouter } from 'next/navigation'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
@@ -73,7 +73,7 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
     try {
       if (!data?.id) {
         const Number = await nextNumber(orgId)
-        const response = await upsertProject({
+        const response = await createProject({
           id: data?.id ? data.id : v4(),
           number: Number,
           name: values.name,
@@ -85,17 +85,22 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
           det_location: values.det_location,
           est_completion: values.est_completion,
           budget: values.budget,
-          description: values.description
+          description: values.description,
+          clientId: null
         })
         toast({
           title: 'Proyecto creado!',
           description: 'El proyecto ha sido creado exitosamente',
         })
-        if (data?.id) return router.refresh()
-        if (response) {
-          return router.refresh()
+        if (data?.id) {
+          await router.push(`/organization/${orgId}/proyectos/${data?.id}`)
+          return
         }
-      }
+        if (response) {
+          await router.push(`/organization/${orgId}/proyectos/${response.id}`)
+          return
+        }
+        }
     } catch (error) {
       console.log(error)
       toast({

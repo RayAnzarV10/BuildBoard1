@@ -7,7 +7,7 @@ interface LocationPickerProps {
     onChange: (value: { lat: number; lng: number } | null) => void;
     value: { lat: number; lng: number } | null;
   };
-  onAddressChange: (address: string) => void; // Nueva prop para manejar el cambio de dirección
+  onAddressChange: (address: string) => void;
   isLoading: boolean;
 }
 
@@ -22,11 +22,14 @@ const LocationPicker = ({ field, onAddressChange, isLoading }: LocationPickerPro
       const place = autocomplete.getPlace()
       if (place.geometry && place.geometry.location) {
         const newLocation = {
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng()
+          lat: Number(place.geometry.location.lat()),
+          lng: Number(place.geometry.location.lng())
         }
         setLocation(newLocation)
-        field.onChange(newLocation)
+        field.onChange({
+          lat: newLocation.lat,
+          lng: newLocation.lng
+        })
         if (place.formatted_address) {
           setSearchText(place.formatted_address)
           onAddressChange(place.formatted_address)
@@ -47,6 +50,21 @@ const LocationPicker = ({ field, onAddressChange, isLoading }: LocationPickerPro
     }
   }
 
+  const handleMarkerDrag = (e: google.maps.MapMouseEvent) => {
+    if (e.latLng) {
+      const newLocation = {
+        lat: Number(e.latLng.lat()),
+        lng: Number(e.latLng.lng())
+      }
+      setLocation(newLocation)
+      field.onChange({
+        lat: newLocation.lat,
+        lng: newLocation.lng
+      })
+      updateAddressFromLatLng(newLocation)
+    }
+  }
+
   const defaultCenter = {
     lat: 19.4326,
     lng: -99.1332
@@ -64,6 +82,7 @@ const LocationPicker = ({ field, onAddressChange, isLoading }: LocationPickerPro
           }}
           center={location || defaultCenter}
           zoom={16}
+          mapTypeId="satellite"
           mapContainerStyle={{
             width: '100%',
             height: '250px',
@@ -76,17 +95,7 @@ const LocationPicker = ({ field, onAddressChange, isLoading }: LocationPickerPro
             <Marker 
               position={location} 
               draggable={true}
-              onDragEnd={(e) => {
-                if (e.latLng) {
-                  const newLocation = {
-                    lat: e.latLng.lat(),
-                    lng: e.latLng.lng()
-                  }
-                  setLocation(newLocation)
-                  field.onChange(newLocation)
-                  updateAddressFromLatLng(newLocation)
-                }
-              }}
+              onDragEnd={handleMarkerDrag}
             />
           )}
         </GoogleMap>

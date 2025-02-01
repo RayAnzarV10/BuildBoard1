@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import Link from "next/link"
-import { getProjects } from "@/lib/queries"
 import { ProjectStatus } from "@prisma/client"
+import { getAllProjects } from "@/lib/queries"
 
 export default function Projects({ orgId, className }: { orgId: string, className?: string }) {
   const [projects, setProjects] = useState<Array<{
@@ -32,7 +32,7 @@ export default function Projects({ orgId, className }: { orgId: string, classNam
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const data = await getProjects(orgId)
+        const data = await getAllProjects(orgId)
         setProjects(data)
       } catch (error) {
         console.error("Error fetching projects:", error)

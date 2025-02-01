@@ -5,7 +5,7 @@ import { ProjectCard } from "@/components/ui/card_buildboard"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { getProjects } from "@/lib/queries"
+import { getAllProjects } from "@/lib/queries"
 import { ProjectStatus } from "@prisma/client"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 import GoogleMapsPin from "@/components/global/GoogleMap"
-import CreateProject from "@/components/forms/new-project"
 
 interface Project {
   number: number
@@ -39,7 +38,6 @@ interface Project {
 interface ProjectDetailsProps {
   project: Project | null
 }
-
 
 const ProjectDetails = ({ project }: ProjectDetailsProps) => {
   if (!project) return (
@@ -132,7 +130,7 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const data = await getProjects(orgId)
+        const data = await getAllProjects(orgId)
         const parsedProjects = data.map(project => ({
           ...project,
           det_location: project.det_location as { lat: number; lng: number }
@@ -285,7 +283,7 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
                 variant="secondary" 
                 className="bg-primary w-full text-white hover:bg-primary/70"
               >
-                Editar Proyecto
+                Ir al Proyecto
               </Button>
             </Link>
           ) : (

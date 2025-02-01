@@ -200,9 +200,12 @@ model Project {
   description           String                @db.Text
   incomes               Income[]
   expenses              Expense[]
+  clientId              String?
+  client                Client?                @relation(fields: [clientId], references: [id])
 
   @@unique([orgId, number])
   @@index([orgId])
+  @@index([clientId])
 }
 
 model Client {
@@ -219,6 +222,7 @@ model Client {
   orgId                   String
   org                     Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
   incomes                 Income[]
+  projects                Project[]
 
   @@index([orgId])
 }

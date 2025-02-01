@@ -3,7 +3,7 @@
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { db } from './db'
 import { redirect } from 'next/navigation'
-import { Organization, Plan, Project, ProjectStatus, User } from '@prisma/client'
+import { Organization, Plan, Project, ProjectStatus, User, Prisma } from '@prisma/client'
 import { number } from 'zod'
 
 export const getAuthUserDetails = async () => {
@@ -227,22 +227,35 @@ export const nextNumber = async (orgId: string) => {
   return response ? response.number + 1 : 1;
 }
 
-export const upsertProject = async (project: Project) => {
-  try {
-    const response = await db.project.upsert({
-      where: {
-        id: project.id,
-      },
-      update: project,
-      create: {
-        ...project
-      }
-    })
-    return response
-  } catch (error) {
-    console.log(error)
-  }
+interface LocationCoordinates {
+  lat: string | number;
+  lng: string | number;
 }
+
+export const createProject = async (project: Project & { det_location?: LocationCoordinates }) => {
+  try {
+    const response = await db.project.create({
+      data: {
+        number: project.number,
+        name: project.name,
+        orgId: project.orgId,
+        status: project.status,
+        location: project.location,
+        det_location: project.det_location ? {
+          lat: Number(project.det_location.lat),
+          lng: Number(project.det_location.lng)
+        } : Prisma.JsonNull,
+        description: project.description,
+        est_completion: project.est_completion,
+        budget: project.budget,
+      }
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 export const getNotificationAndUser = async (orgId: string) => {
   try {
@@ -283,10 +296,26 @@ export const getProjectWhere = async (orgId: string, status: ProjectStatus) => {
   });
 }
 
-export const getProjects = async (orgId: string) => {
+export const getAllProjects = async (orgId: string) => {
   return await db.project.findMany({
+    where: { orgId }
+  });
+}
+
+export const getProject = async (orgId: string, projectId: string) => {
+  return await db.project.findUnique({
     where: {
-      orgId: orgId,
+      id: projectId,
+      orgId: orgId
+    }
+  });
+}
+
+export const getClient = async (orgId: string, clientId: string) => {
+  return await db.client.findUnique({
+    where: {
+      id: clientId,
+      orgId: orgId
     }
   });
 }
