@@ -72,30 +72,15 @@ npx prisma migrate dev
 npm run dev
 ```
 
-## 📝 Esquema Base de Datos
+## 📝 Estructura de Datos
 
-```prisma
-model Project {
-  id              String        @id @default(uuid())
-  number          Int
-  orgId           String
-  org             Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  name            String
-  status          ProjectStatus
-  location        String        @db.Text
-  det_location    Json?
-  est_completion  DateTime
-  budget          Float
-  description     String        @db.Text
-  incomes         Income[]
-  expenses        Expense[]
+El sistema maneja diferentes entidades para organizar la información:
 
-  @@unique([orgId, number])
-  @@index([orgId])
-}
-```
+- Organizaciones
+- Proyectos
+- Presupuestos
+- Entre otros
+
 
 ## 🤝 Contribución
 
@@ -105,11 +90,9 @@ model Project {
 4. Push a la rama (`git push origin feature/NuevaCaracteristica`)
 5. Crear Pull Request
 
-## 📄 Licencia
-[Especificar licencia]
-
 ## 📞 Contacto
-[Información de contacto]
+- Email: [rayfcoanzar@gmail.com] (mailto:rayfcoanzar@gmail.com)
+- LinkedIn: [Raymundo Francisco Anzar Villalobos] (www.linkedin.com/in/raymundo-francisco-anzar-villalobos)
 
 ---
 *Proyecto en desarrollo activo - Las funcionalidades pueden ser expandidas o modificadas.*
