@@ -91,8 +91,8 @@ El sistema maneja diferentes entidades para organizar la información:
 5. Crear Pull Request
 
 ## 📞 Contacto
-- Email: [rayfcoanzar@gmail.com] (mailto:rayfcoanzar@gmail.com)
-- LinkedIn: [Raymundo Francisco Anzar Villalobos] (www.linkedin.com/in/raymundo-francisco-anzar-villalobos)
+- Email: [rayfcoanzar@gmail.com](mailto:rayfcoanzar@gmail.com)
+- LinkedIn: [Raymundo Francisco Anzar Villalobos](www.linkedin.com/in/raymundo-francisco-anzar-villalobos)
 
 ---
 *Proyecto en desarrollo activo - Las funcionalidades pueden ser expandidas o modificadas.*
