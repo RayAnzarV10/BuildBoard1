@@ -50,8 +50,12 @@ BuildBoard es un software diseñado específicamente para simplificar la gestió
 
 ---
 
-¿Preguntas? ¿Sugerencias? [Contáctanos]
+¿Preguntas? ¿Sugerencias? Contáctanos:
 
+### 📞 Contacto
+- Email: [rayfcoanzar@gmail.com](mailto:rayfcoanzar@gmail.com)
+- LinkedIn: [Raymundo Francisco Anzar Villalobos](https://www.linkedin.com/in/raymundo-francisco-anzar-villalobos)
+
+--- 
 *BuildBoard - Simplificando la gestión de tu empresa constructora*
-
 <sub>*Proyecto en desarrollo activo - Las funcionalidades pueden ser expandidas o modificadas.*</sub>
