@@ -6,6 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 export function NavUser({
   user,
@@ -27,7 +28,7 @@ export function NavUser({
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           asChild
         >
-          <a href={`/organization/${orgId}/profile`}>
+          <Link href={`/organization/${orgId}/profile`}>
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage src={avatar} alt={user} />
             </Avatar>
@@ -35,7 +36,7 @@ export function NavUser({
               <span className="truncate font-semibold">{user}</span>
               <span className="truncate text-xs">{email}</span>
             </div>
-          </a>
+          </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

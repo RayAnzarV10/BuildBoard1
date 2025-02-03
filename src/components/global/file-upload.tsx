@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast'
 
 
 type Props = {
-    apiEndpoint: 'logo' | 'avatar' | 'subAccountLogo'
+    apiEndpoint: 'logo' | 'avatar'
     onChange: (url?:string) => void
     value?: string
 }

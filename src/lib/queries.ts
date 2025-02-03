@@ -335,25 +335,22 @@ export const getClients = async (orgId: string) => {
   });
 };
 
-export const assignClientToProject = async (projectId: string, clientId2: string) => {
-  console.log('Debug - Valores recibidos:', { projectId, clientId2 }); // Debug log
-  try {
-    if (!projectId || !clientId2) {
-      throw new Error(`Valores inválidos - projectId: ${projectId}, clientId2: ${clientId2}`);
+export const assignClientToProject = async (projectId: string, clientId: string) => {
+  return await db.project.update({
+    where: { id: projectId },
+    data: { 
+      clientId: clientId,
+      updatedAt: new Date()
     }
+  });
+};
 
-    const project = await db.project.update({
-      where: { id: projectId },
-      data: { 
-        clientId: clientId2,
-        updatedAt: new Date()
-      }
-    });
-
-    console.log('Debug - Proyecto actualizado:', project); // Debug log
-    return project;
-  } catch (error) {
-    console.error('Debug - Error en assignClientToProject:', error); // Debug log
-    throw error;
-  }
+export const removeClientFromProject = async (projectId: string) => {
+  return await db.project.update({
+    where: { id: projectId },
+    data: { 
+      clientId: null,
+      updatedAt: new Date()
+    }
+  });
 };

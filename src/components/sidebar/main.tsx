@@ -18,6 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarImage } from "../ui/avatar"
+import Link from "next/link"
 
 export function NavMain({
   items,
@@ -63,10 +64,10 @@ export function NavMain({
                       )}
                     </a>
                     ) : (
-                    <a href={`/organization/${orgId}/${item.url}`}>
+                    <Link href={`/organization/${orgId}/${item.url}`}>
                       {item.icon && <item.icon />}
                       <span className="font-semibold">{item.title}</span>
-                    </a>
+                    </Link>
                     )}
                 </SidebarMenuButton>
                   {item.items && (
@@ -75,9 +76,9 @@ export function NavMain({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={`/organization/${orgId}/${subItem.url}`}>
+                            <Link href={`/organization/${orgId}/${subItem.url}`}>
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
@@ -112,7 +113,7 @@ export function OrganizationProfile ({
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           asChild
         >
-          <a href={`${orgId}/account`}>
+          <Link href={`${orgId}/account`}>
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage src={orgLogo} alt={orgName} />
             </Avatar>
@@ -121,7 +122,7 @@ export function OrganizationProfile ({
               <span className="truncate text-xs">{orgEmail}</span>
             </div>
             <GalleryVerticalEnd className="ml-auto size-4" />
-          </a>
+          </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

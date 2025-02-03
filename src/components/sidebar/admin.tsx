@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react"
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar"
 import { Collapsible } from "../ui/collapsible"
+import Link from "next/link"
 
 export function NavAdmin({
     items,
@@ -31,13 +32,13 @@ export function NavAdmin({
             >
               <SidebarMenuItem className="hover:bg-muted rounded-md hover:shadow-lg">
                 <SidebarMenuButton asChild>
-                  <a href={`/organization/${orgId}/${item.url}`}>
+                  <Link href={`/organization/${orgId}/${item.url}`}>
                     {item.icon && <item.icon />}
                     <span className="font-semibold">{item.title}</span>
                     {item.isBeta && (
                       <span className="text-sm bg-accent font-semibold text-accent-foreground rounded-md py-1 p-1 ml-auto">Beta</span>
                     )}
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </Collapsible>

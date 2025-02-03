@@ -214,11 +214,13 @@ model Client {
   updatedAt               DateTime            @updatedAt
   name                    String
   phone                   String
-  address                  String?
+  address                 String?
   city                    String?
   state                   String?
   country                 String?
-  description             String              @db.Text
+  company                 String?
+  email                   String       
+  description             String?             @db.Text
   orgId                   String
   org                     Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
   incomes                 Income[]

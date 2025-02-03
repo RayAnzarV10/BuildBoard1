@@ -27,6 +27,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { ClientDialog } from "@/components/forms/client-assignement"
 import { useRouter } from "next/navigation"
+import { ClientInfo } from "./client-info"
 
 interface Task {
   id: string
@@ -122,7 +123,6 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
                 </div>
                 <div className="flex items-center gap-1">
                   <UserCircle className="w-4 h-4 shrink-0" />
-                  {/* {project.client.company} Nombre del cliente */}
                   {client ? client.name : "No hay cliente asignado"}
                 </div>
                 <div className="flex items-center gap-1">
@@ -143,8 +143,6 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
                 Editar Proyecto
               </Button>
             </div>
-
-            {/* Menú desplegable para pantallas pequeñas */}
             <div className="md:hidden">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -239,7 +237,7 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
             <TabsTrigger value="tasks">Tareas</TabsTrigger>
             <TabsTrigger value="team">Equipo</TabsTrigger>
             <TabsTrigger value="files">Archivos</TabsTrigger>
-            <TabsTrigger value="IA">Recomendación IA</TabsTrigger>
+            <TabsTrigger value="IA">✨IA✨</TabsTrigger>
           </TabsList>
     
           <TabsContent value="IA" className="space-y-4">
@@ -279,37 +277,12 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
                   </div>
                 </CardContent>
               </Card>
-    
-              <Card className="col-span-2 bg-primary-foreground shadow-lg">
-                <CardHeader>
-                  <CardTitle>Información del Cliente</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {project.clientId ? (
-                    // Información del cliente cuando existe
-                    <div>
-                      Información del cliente aquí
-                    </div>
-                  ) : (
-                    // Mensaje cuando no hay cliente
-                    <div className="flex flex-col items-center justify-center py-6 text-center space-y-4">
-                      <UserPlus className="h-12 w-12 text-gray-400" />
-                      <div>
-                        <p className="text-lg font-medium text-gray-900">No hay cliente asignado</p>
-                        <p className="text-sm text-gray-500">Asigna un cliente a este proyecto para ver su información</p>
-                      </div>
-                      <ClientDialog 
-                        projectId={ projectId } 
-                        orgId={ orgId } 
-                        onClientAssigned={() => {
-                          router.refresh(); // Esto refrescará los datos de la página
-                        }} 
-                        currentClientId={ project?.clientId || undefined }
-                      />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+
+              <ClientInfo 
+                project={project} 
+                client={client || null} 
+                orgId={orgId} 
+              />
             </div>
     
             <Card className="bg-primary-foreground shadow-lg">

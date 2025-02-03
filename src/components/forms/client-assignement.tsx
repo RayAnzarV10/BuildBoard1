@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React from 'react'
 import { z } from 'zod'
@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Client } from '@prisma/client'
 import { useToast } from '@/hooks/use-toast'
-import { createClient, assignClientToProject, getClients } from '@/lib/queries'
-import { v4 } from 'uuid'
+import { createClient, assignClientToProject, removeClientFromProject, getClient, getClients } from '@/lib/queries'
+import { X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -30,24 +30,20 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Loading from '../global/loading'
+import { useRouter } from 'next/navigation';
 
 const FormSchema = z.object({
   name: z.string().min(2, { message: 'El nombre debe tener al menos 2 caracteres' }),
   phone: z.string().min(10, { message: 'El teléfono debe tener al menos 10 dígitos' }),
+  email: z.string().email({ message: 'Ingresa un email válido' }),
+  company: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   country: z.string().optional(),
-  description: z.string().min(1, { message: 'La descripción es requerida' }),
+  description: z.string().optional()
 })
 
 interface ClientDialogProps {
@@ -81,7 +77,7 @@ export const ClientDialog = ({
     },
   })
 
-  const isLoading = form.formState.isSubmitting
+  const isLoading = form.formState.isSubmitting;
 
   React.useEffect(() => {
     const fetchClients = async () => {
@@ -89,11 +85,11 @@ export const ClientDialog = ({
         const data = await getClients(orgId);
         setClients(data);
       } catch (error) {
-        console.error("Error fetching clients:", error);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Error al cargar los clientes"
+          description: "Error al cargar los clientes",
+          duration: 3000
         });
       }
     };
@@ -108,27 +104,40 @@ export const ClientDialog = ({
   );
 
   const handleAssignClient = async (clientId: string) => {
-    console.log('Debug - handleAssignClient llamado con:', { projectId, clientId }); // Debug log
     try {
-      if (!projectId || !clientId) {
-        throw new Error('ProjectId o ClientId faltante');
-      }
-  
-      const result = await assignClientToProject(projectId, clientId);
-      console.log('Debug - Resultado de asignación:', result); // Debug log
-      
+      await assignClientToProject(projectId, clientId);
       toast({
         title: "Cliente asignado",
-        description: "El cliente ha sido asignado exitosamente"
+        description: "El cliente ha sido asignado exitosamente",
+        duration: 3000
       });
       onClientAssigned();
       setOpen(false);
     } catch (error) {
-      console.error('Debug - Error en handleAssignClient:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error al asignar el cliente"
+        description: "Error al asignar el cliente",
+        duration: 3000
+      });
+    }
+  };
+
+  const handleRemoveClient = async () => {
+    try {
+      await removeClientFromProject(projectId);
+      toast({
+        title: "Cliente removido",
+        description: "El cliente ha sido removido exitosamente",
+        duration: 3000
+      });
+      onClientAssigned();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error al remover el cliente",
+        duration: 3000
       });
     }
   };
@@ -143,152 +152,197 @@ export const ClientDialog = ({
       await handleAssignClient(newClient.id);
       form.reset();
     } catch (error) {
-      console.error("Error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error al crear el cliente"
+        description: "Error al crear el cliente",
+        duration: 3000
       });
     }
   };
 
+  const router = useRouter();
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">+ Asignar Cliente</Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-screen overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Asignar Cliente al Proyecto</DialogTitle>
-          <DialogDescription>
-            Selecciona un cliente existente o crea uno nuevo
-          </DialogDescription>
-        </DialogHeader>
+    <div className="flex gap-2">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="outline" 
+            className="text-xs sm:text-sm px-2 py-1 sm:px-4 sm:py-2"
+          >
+            <span className="block sm:hidden">Cambiar</span>
+            <span className="hidden sm:block">
+              {currentClientId ? "Cambiar Cliente" : "+ Asignar Cliente"}
+            </span>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl max-h-screen overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {currentClientId ? "Cambiar Cliente" : "Asignar Cliente al Proyecto"}
+            </DialogTitle>
+            <DialogDescription>
+              Selecciona un cliente existente o crea uno nuevo
+            </DialogDescription>
+          </DialogHeader>
 
-        <Tabs defaultValue="existing" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="existing">Cliente Existente</TabsTrigger>
-            <TabsTrigger value="new">Nuevo Cliente</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="existing" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="existing">Cliente Existente</TabsTrigger>
+              <TabsTrigger value="new">Nuevo Cliente</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="existing">
-            <Card>
-              <CardHeader>
-                <CardTitle>Clientes Existentes</CardTitle>
-                <CardDescription>
-                  Busca y selecciona un cliente de la lista
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Input
-                    placeholder="Buscar cliente..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <ScrollArea className="h-72">
-                    <div className="space-y-4">
-                      {filteredClients.map((client) => (
-                        <Card
-                          key={client.id}
-                          className="cursor-pointer hover:bg-slate-100 transition-colors"
-                          onClick={() => handleAssignClient(client.id)}
-                        >
-                          <CardHeader>
-                            <CardTitle className="text-lg">{client.name}</CardTitle>
-                            <CardDescription>
-                              <div>{client.phone}</div>
-                              {client.city && (
-                                <div>
-                                  {client.city}, {client.state}, {client.country}
-                                </div>
-                              )}
-                            </CardDescription>
-                          </CardHeader>
-                        </Card>
-                      ))}
-                    </div>
-                  </ScrollArea>
+            <TabsContent value="existing">
+              <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                <div className="flex flex-col space-y-1.5 p-6">
+                  <h3 className="text-2xl font-semibold">Clientes Existentes</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Busca y selecciona un cliente de la lista
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="new">
-            <Card>
-              <CardHeader>
-                <CardTitle>Crear Nuevo Cliente</CardTitle>
-                <CardDescription>
-                  Ingresa los datos del nuevo cliente
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Nombre del cliente"
-                              {...field}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                <div className="p-6 pt-0">
+                  <div className="space-y-4">
+                    <Input
+                      placeholder="Buscar cliente..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    <ScrollArea className="h-72">
+                      <div className="space-y-4">
+                        {filteredClients.map((client) => (
+                          <div
+                            key={client.id}
+                            onClick={() => handleAssignClient(client.id)}
+                            className="rounded-lg border bg-card p-6 cursor-pointer hover:bg-muted transition-colors"
+                          >
+                            <div className="flex flex-col space-y-1.5">
+                              <h3 className="text-lg font-semibold">{client.name}</h3>
+                              <div className="text-sm text-muted-foreground">
+                                <div>{client.phone}</div>
+                                {client.city && (
+                                  <div>
+                                    {client.city}, {client.state}, {client.country}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </div>
+                <div 
+                  onClick={() => router.push(`/organization/${orgId}/clientes`)}
+                  className="p-4 mt-2 border-t text-center hover:bg-muted transition-colors cursor-pointer"
+                >
+                  <span className="text-blue-500">Ver todos los clientes →</span>
+                </div>
+              </div>
+            </TabsContent>
 
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Teléfono</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Teléfono del cliente"
-                              {...field}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+            <TabsContent value="new">
+              <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                <div className="flex flex-col space-y-1.5 p-6">
+                  <h3 className="text-2xl font-semibold">Crear Nuevo Cliente</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Ingresa los datos del nuevo cliente
+                  </p>
+                </div>
+                <div className="p-6 pt-0">
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      {/* Nombre y Empresa en la misma fila */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nombre</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Nombre del cliente"
+                                  {...field}
+                                  disabled={isLoading}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
 
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Dirección</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Dirección del cliente"
-                              {...field}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        <FormField
+                          control={form.control}
+                          name="company"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Empresa</FormLabel>
+                              <FormLabel className='text-muted-foreground'> (Opcional)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Nombre de la empresa"
+                                  {...field}
+                                  disabled={isLoading}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                      {/* Teléfono y Email en la misma fila */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Teléfono</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Teléfono del cliente"
+                                  {...field}
+                                  disabled={isLoading}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="correo@ejemplo.com"
+                                  type="email"
+                                  {...field}
+                                  disabled={isLoading}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
                       <FormField
                         control={form.control}
-                        name="city"
+                        name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Ciudad</FormLabel>
+                            <FormLabel>Dirección</FormLabel>
+                            <FormLabel className='text-muted-foreground'> (Opcional)</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Ciudad"
+                                placeholder="Dirección del cliente"
                                 {...field}
                                 disabled={isLoading}
                               />
@@ -298,15 +352,76 @@ export const ClientDialog = ({
                         )}
                       />
 
+                      {/* Ciudad, Estado y País en la misma fila */}
+                      <div className="grid grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Ciudad</FormLabel>
+                              <FormLabel className='text-muted-foreground'> (Opcional)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Ciudad"
+                                  {...field}
+                                  disabled={isLoading}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="state"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Estado</FormLabel>
+                              <FormLabel className='text-muted-foreground'> (Opcional)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Estado"
+                                  {...field}
+                                  disabled={isLoading}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>País</FormLabel>
+                              <FormLabel className='text-muted-foreground'> (Opcional)</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="País"
+                                  {...field}
+                                  disabled={isLoading}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
                       <FormField
                         control={form.control}
-                        name="state"
+                        name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Estado</FormLabel>
+                            <FormLabel>Descripción</FormLabel>
+                            <FormLabel className='text-muted-foreground'> (Opcional)</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="Estado"
+                              <Textarea
+                                placeholder="Descripción del cliente"
                                 {...field}
                                 disabled={isLoading}
                               />
@@ -315,58 +430,32 @@ export const ClientDialog = ({
                           </FormItem>
                         )}
                       />
-                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="country"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>País</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="País"
-                              {...field}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <Button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full"
+                      >
+                        {isLoading ? <Loading /> : 'Crear y Asignar Cliente'}
+                      </Button>
+                    </form>
+                  </Form>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
 
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Descripción</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Descripción del cliente"
-                              {...field}
-                              disabled={isLoading}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      {isLoading ? <Loading /> : 'Crear y Asignar Cliente'}
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+      {currentClientId && (
+        <Button 
+          variant="destructive" 
+          size="icon"
+          onClick={handleRemoveClient}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
   );
 };
