@@ -214,7 +214,7 @@ model Client {
   updatedAt               DateTime            @updatedAt
   name                    String
   phone                   String
-  adress                  String?
+  address                  String?
   city                    String?
   state                   String?
   country                 String?
@@ -233,7 +233,7 @@ model Supplier {
   updatedAt               DateTime             @updatedAt
   name                    String
   phone                   String
-  adress                  String?
+  address                  String?
   city                    String?
   state                   String?
   country                 String?

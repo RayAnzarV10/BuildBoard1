@@ -22,6 +22,11 @@ import {
 } from "lucide-react"
 import { Client, Project, ProjectStatus } from "@prisma/client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { ClientDialog } from "@/components/forms/client-assignement"
+import { useRouter } from "next/navigation"
 
 interface Task {
   id: string
@@ -87,6 +92,8 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
       "In_Progress": 'bg-gradient-to-r from-blue-600 to-blue-900',
       "Completed": 'bg-gradient-to-r from-green-600 to-green-900',
     }
+
+    const router = useRouter()
 
     return (
       <div className="space-y-4">
@@ -291,10 +298,14 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
                         <p className="text-lg font-medium text-gray-900">No hay cliente asignado</p>
                         <p className="text-sm text-gray-500">Asigna un cliente a este proyecto para ver su información</p>
                       </div>
-                      <Button variant="outline">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Asignar Cliente
-                      </Button>
+                      <ClientDialog 
+                        projectId={ projectId } 
+                        orgId={ orgId } 
+                        onClientAssigned={() => {
+                          router.refresh(); // Esto refrescará los datos de la página
+                        }} 
+                        currentClientId={ project?.clientId || undefined }
+                      />
                     </div>
                   )}
                 </CardContent>
