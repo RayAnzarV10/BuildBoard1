@@ -3,12 +3,13 @@ import { Notifications } from '@/components/sidebar/notifications'
 import { AppSidebar } from '@/components/sidebar/sidebar'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { useIsLarge } from '@/hooks/use-mobile'
 import { getAuthUserDetails, getNotificationAndUser } from '@/lib/queries'
 import { UserButton } from '@clerk/nextjs'
-import { currentUser } from '@clerk/nextjs/server'
-import Image from 'next/image'
+import { Client, currentUser } from '@clerk/nextjs/server'
 import React from 'react'
 import { ReactNode } from 'react';
+import { ClientSideWrapper } from './client-wrapper'
 
 const NavBar = async ({ children }: { children: ReactNode }) => {
 
@@ -29,8 +30,8 @@ const NavBar = async ({ children }: { children: ReactNode }) => {
   if (notifications) allNoti = notifications
 
   return (
-    <SidebarProvider>
-      <AppSidebar user={ user } orgName={ orgName } orgId={ orgId } orgLogo={ logo } orgEmail={ orgEmail } userName={ userName } userEmail={ userEmail } userAvatar={ userAvatar } />
+  <ClientSideWrapper>
+    <AppSidebar user={ user } orgName={ orgName } orgId={ orgId } orgLogo={ logo } orgEmail={ orgEmail } userName={ userName } userEmail={ userEmail } userAvatar={ userAvatar } />
       <SidebarInset>  
         <nav className='sticky z-10 top-0 flex items-center gap-2 p-4'>
           <div className='p-2 flex w-full rounded-md items-center justify-between shadow-lg top-0 right-0 left-0 z-10 bg-secondary' >
@@ -52,8 +53,8 @@ const NavBar = async ({ children }: { children: ReactNode }) => {
         </nav>
         {children}
       </SidebarInset>
-    </SidebarProvider>
-  );
+    </ClientSideWrapper>
+);
 }
 
 export default NavBar

@@ -6,6 +6,7 @@ import { UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Client, Project } from "@prisma/client";
 import { ClientDialog } from "@/components/forms/client-assignement";
+import Link from "next/link";
 
 interface ClientInfoProps {
   project: Project;
@@ -20,7 +21,7 @@ export const ClientInfo = ({ project, client, orgId }: ClientInfoProps) => {
   };
 
   return (
-    <Card className="col-span-2 bg-primary-foreground dark:bg-card shadow-lg">
+    <Card className="sm:col-span-2 bg-primary-foreground dark:bg-card shadow-lg w-full">
       <CardHeader>
         <CardTitle>Información del Cliente</CardTitle>
       </CardHeader>
@@ -28,8 +29,10 @@ export const ClientInfo = ({ project, client, orgId }: ClientInfoProps) => {
         {client ? (
           <div className="space-y-4">
             <div>
+            <Link href={`/org/${orgId}/clientes/${client.id}`}>  
               <div className="text-sm text-muted-foreground">Nombre</div>
-              <div className="font-medium truncate">{client.name}</div>
+              <div className="font-medium truncate hover:underline hover:text-blue-600">{client.name}</div>
+            </Link>
             </div>
             {client.company ? (
               <div>

@@ -17,3 +17,21 @@ export function useIsMobile() {
 
   return !!isMobile
 }
+
+const LG_BREAKPOINT = 1024 // Tailwind lg breakpoint
+
+export function useIsLarge() {
+  const [isLarge, setIsLarge] = React.useState<boolean | undefined>(undefined)
+
+  React.useEffect(() => {
+    const mql = window.matchMedia(`(min-width: ${LG_BREAKPOINT}px)`)
+    const onChange = () => {
+      setIsLarge(window.innerWidth >= LG_BREAKPOINT)
+    }
+    mql.addEventListener("change", onChange)
+    setIsLarge(window.innerWidth >= LG_BREAKPOINT)
+    return () => mql.removeEventListener("change", onChange)
+  }, [])
+
+  return !!isLarge
+}

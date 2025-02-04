@@ -16,16 +16,11 @@ import {
   MoreHorizontal,
   Plus,
   UserCircle,
-  UserPlus,
   Users2,
   Wallet,
 } from "lucide-react"
 import { Client, Project, ProjectStatus } from "@prisma/client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { ClientDialog } from "@/components/forms/client-assignement"
 import { useRouter } from "next/navigation"
 import { ClientInfo } from "./client-info"
 
@@ -247,8 +242,8 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
           </TabsContent>
 
           <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-5 gap-4">
-              <Card className="col-span-3 bg-primary-foreground shadow-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+              <Card className="sm:col-span-3 bg-primary-foreground shadow-lg">
                 <CardHeader>
                   <CardTitle>Descripción del Proyecto</CardTitle>
                 </CardHeader>

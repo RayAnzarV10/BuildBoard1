@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Client } from '@prisma/client'
 import { useToast } from '@/hooks/use-toast'
-import { createClient, assignClientToProject, removeClientFromProject, getClient, getClients } from '@/lib/queries'
+import { createClient, assignClientToProject, removeClientFromProject, getClients } from '@/lib/queries'
 import { X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -21,7 +21,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -65,6 +64,7 @@ export const ClientDialog = ({
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
@@ -74,6 +74,8 @@ export const ClientDialog = ({
       state: '',
       country: '',
       description: '',
+      email: '',
+      company: '',
     },
   })
 
@@ -169,7 +171,7 @@ export const ClientDialog = ({
         <DialogTrigger asChild>
           <Button 
             variant="outline" 
-            className="text-xs sm:text-sm px-2 py-1 sm:px-4 sm:py-2"
+            className="text-xs px-2 py-1"
           >
             <span className="block sm:hidden">Cambiar</span>
             <span className="hidden sm:block">
@@ -253,7 +255,6 @@ export const ClientDialog = ({
                 <div className="p-6 pt-0">
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                      {/* Nombre y Empresa en la misma fila */}
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
@@ -293,7 +294,6 @@ export const ClientDialog = ({
                         />
                       </div>
 
-                      {/* Teléfono y Email en la misma fila */}
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
