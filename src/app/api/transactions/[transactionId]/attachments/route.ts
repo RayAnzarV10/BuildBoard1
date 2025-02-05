@@ -1,42 +1,43 @@
 // app/api/transactions/[transactionId]/attachments/route.ts
 import { NextResponse } from "next/server";
 import { uploadTransactionFile } from "@/lib/s3";
-import { attachment, getAuthUserDetails, transaction, verifyAndAcceptInvitation } from "@/lib/queries";
-import { get } from "http";
 
 export async function POST(
   req: Request,
-  { params }: { params: { transactionId: string } }
+  context: { params: { transactionId: string } }
 ) {
   try {
-    const orgId = await verifyAndAcceptInvitation()
-    const userId = await getAuthUserDetails();
-    if (!userId || !orgId) {
-      return new NextResponse("No autorizado", { status: 401 });
-    }
+    console.log('API Route - Starting file upload process');
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
     
     if (!file) {
+      console.log('No file provided');
       return new NextResponse("No se proporcionó archivo", { status: 400 });
     }
 
-    const response = await transaction(orgId, params.transactionId);
+    console.log('File details:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
 
-    if (!response) {
-      return new NextResponse("Transacción no encontrada", { status: 404 });
-    }
+    // Para archivos temporales, procesamos directamente
+    const fileData = await uploadTransactionFile(
+      file, 
+      "temp-org", // Usamos un orgId temporal para pruebas
+      context.params.transactionId
+    );
 
-    // Subir archivo a S3
-    const fileData = await uploadTransactionFile(file, orgId as string, params.transactionId);
+    console.log('File upload successful:', fileData);
 
-    // Guardar referencia en la base de datos
-    const attachmentResponse = await attachment(fileData, params.transactionId);
-
-    return NextResponse.json(attachmentResponse);
+    return NextResponse.json(fileData);
   } catch (error) {
-    console.error("[TRANSACTION_ATTACHMENT_POST]", error);
-    return new NextResponse("Error interno", { status: 500 });
+    console.error("API Route Error:", error);
+    return new NextResponse(
+      "Error al procesar el archivo", 
+      { status: 500 }
+    );
   }
 }

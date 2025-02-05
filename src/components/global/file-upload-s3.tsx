@@ -1,62 +1,57 @@
-// components/FileUpload.tsx
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "../ui/input";
 
-export function FileUpload() {
+interface FileUploadProps {
+  transactionId: string;
+  onComplete?: () => void;
+  onError?: (error: Error) => void;
+}
+
+export function FileUpload({ 
+  transactionId, 
+  onComplete, 
+  onError 
+}: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
 
   const handleUpload = async (file: File) => {
     try {
       setUploading(true);
 
-      // 1. Obtener la URL firmada del servidor
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Error obteniendo la URL de subida');
-
-      const { url, fields } = await response.json();
-
-      // 2. Subir el archivo directamente a S3
       const formData = new FormData();
-      Object.entries(fields).forEach(([key, value]) => {
-        formData.append(key, value as string);
-      });
       formData.append("file", file);
 
-      const uploadResponse = await fetch(url, {
+      const response = await fetch(`/api/transactions/${transactionId}/attachments`, {
         method: "POST",
         body: formData,
       });
 
-      if (!uploadResponse.ok) throw new Error('Error subiendo el archivo');
+      if (!response.ok) {
+        throw new Error('Error al subir el archivo');
+      }
 
-      // La URL del archivo será:
-      const fileUrl = `https://${process.env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.amazonaws.com/${fields.key}`;
+      const result = await response.json();
+      console.log('Archivo subido con éxito:', result);
       
-      console.log('Archivo subido con éxito:', fileUrl);
-      
+      if (onComplete) {
+        onComplete();
+      }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error subiendo el archivo");
+      if (onError) {
+        onError(error instanceof Error ? error : new Error('Error desconocido'));
+      }
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div>
-      <input
+    <div className="flex flex-col gap-4">
+      <Input
         type="file"
         onChange={(e) => {
           const file = e.target.files?.[0];
@@ -64,8 +59,20 @@ export function FileUpload() {
         }}
         accept=".pdf,.png,.jpg,.jpeg"
         disabled={uploading}
+        className="hidden"
+        id={`file-upload-${transactionId}`}
       />
-      {uploading && <p>Subiendo archivo...</p>}
+      <label htmlFor={`file-upload-${transactionId}`}>
+        <Button 
+          type="button"
+          variant="outline" 
+          disabled={uploading}
+          className="cursor-pointer"
+        >
+          {uploading ? 'Subiendo...' : 'Seleccionar archivo'}
+        </Button>
+      </label>
+      {uploading && <p className="text-sm text-gray-500">Subiendo archivo...</p>}
     </div>
   );
 }

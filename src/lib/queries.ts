@@ -419,3 +419,9 @@ export const attachment = async (fileData: any, transactionId: string) => {
     },
   });
 }
+
+export const createTransaction = async (transaction: any) => {
+  return await db.transaction.create({
+    data: transaction
+  });
+}

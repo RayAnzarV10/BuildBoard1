@@ -177,9 +177,6 @@ export default function ProjectPage({orgId, projectId, project, client, clients,
                     projectId={ projectId } 
                     orgId={ orgId } 
                     clients={ clients||[] } 
-                    onSubmit={ function ( data: any ): Promise<void> {
-                    throw new Error( "Function not implemented." )
-                  } }                    
                   />
                 </div>                
                 <div className="text-2xl font-bold text-white truncate">
