@@ -30,12 +30,10 @@ model Organization {
   state                   String          
   country                 String              
   users                   User[]          
-  client                  Client[]
   addOns                  AddOns[]          
   createdAt               DateTime            @default(now())
   updatedAt               DateTime            @updatedAt
   projects                Project[]
-  supplier                Supplier[]
   invitation              Invitation[]
   subscription            Subscription?
   notification            Notification[]
@@ -45,36 +43,11 @@ model Organization {
   pains                   String              @db.Text
   expectations            String              @db.Text
   paymentMethods          String              @db.Text
-  Income                  Income[]
-  Expense                 Expense[]
+  transactions            Transaction[]
+  parties                 Party[]
+  mediaAttachment MediaAttachment[]
 
   @@index([id])
-}
-
-model MediaExpense {
-  id              String        @id @default(uuid())
-  name            String
-  type            String?
-  link            String        @unique
-  expenseId       String
-  expense         Expense       @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@index([expenseId])
-}
-
-model MediaIncome {
-  id              String        @id @default(uuid())
-  name            String
-  type            String?
-  link            String        @unique
-  incomeId        String
-  income          Income        @relation(fields: [incomeId], references: [id], onDelete: Cascade)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@index([incomeId])
 }
 
 model AddOns {
@@ -180,6 +153,7 @@ model Invitation {
 
 enum ProjectStatus {
   Planning
+  
   In_Progress
   Completed
 }
@@ -198,107 +172,115 @@ model Project {
   est_completion        DateTime    
   budget                Float
   description           String                @db.Text
-  incomes               Income[]
-  expenses              Expense[]
+  transactions          Transaction[]
   clientId              String?
-  client                Client?                @relation(fields: [clientId], references: [id])
+  client                Party?                @relation(fields: [clientId], references: [id])
 
   @@unique([orgId, number])
   @@index([orgId])
   @@index([clientId])
 }
 
-model Client {
-  id                      String              @id @default(uuid())
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
-  name                    String
-  phone                   String
-  address                 String?
-  city                    String?
-  state                   String?
-  country                 String?
-  company                 String?
-  email                   String       
-  description             String?             @db.Text
-  orgId                   String
-  org                     Organization        @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  incomes                 Income[]
-  projects                Project[]
-
-  @@index([orgId])
+enum PartyType {
+  CLIENT
+  SUPPLIER
 }
 
-model Supplier {
-  id                      String               @id @default(uuid())
-  createdAt               DateTime             @default(now())
-  updatedAt               DateTime             @updatedAt
-  name                    String
-  phone                   String
-  address                  String?
-  city                    String?
-  state                   String?
-  country                 String?
-  description             String               @db.Text
-  orgId                   String
-  org                     Organization         @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  expense                 Expense[]
+model Party {
+  id            String          @id @default(uuid())
+  type          PartyType       // Distingue entre cliente y proveedor
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  name          String
+  phone         String
+  email         String?         // Opcional ya que los proveedores podrían no tenerlo
+  company       String?         // Para clientes que representen empresas
+  address       String?
+  city          String?
+  state         String?
+  country       String?
+  description   String?         @db.Text
+  orgId         String
+  org           Organization    @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]   // Relación con transacciones
+  projects      Project[]       // Solo relevante para clientes
 
   @@index([orgId])
+  @@index([type]) // Útil para filtrar por tipo
 }
 
-model Income {
-  id String @id @default(uuid())
-  orgId String
-  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  projectId String
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  date DateTime
-  clientId String 
-  client Client @relation(fields: [clientId], references: [id])
-  amount Float
-  tax Float
-  description String @db.Text
-  paymentMethod String
-  currency String
-  exchangeRate Float
-  category String
-  inv_number String?
-  receipt_path MediaIncome[]
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  CREDIT_CARD
+  DEBIT_CARD
+  OTHER
+}
+
+enum Currency {
+  MXN
+  USD
+  EUR
+  OTHER
+}
+
+model Transaction {
+  id            String         @id @default(uuid())
+  type          TransactionType
+  orgId         String
+  org           Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  projectId     String
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  date          DateTime
+  partyId       String        // clientId o supplierId
+  party         Party         @relation(fields: [partyId], references: [id]) // Unifica Client y Supplier
+  amount        Float
+  taxes         TransactionTax[]
+  description   String        @db.Text
+  paymentMethod PaymentMethod
+  currency      Currency
+  exchangeRate  Float
+  category      String        // O usar enum si las categorías son fijas
+  invoiceNumber String?
+  recurrence    String?
+  attachments   MediaAttachment[]
 
   @@index([projectId])
-  @@index([clientId])
+  @@index([partyId])
   @@index([orgId])
 }
 
-model Expense {
-  id String @id @default(uuid())
-  orgId String
-  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  projectId String
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  date DateTime
-  supplierId String
-  supplier Supplier @relation(fields: [supplierId], references: [id])
-  name String
-  rfc String? @db.Text
-  amount Float
-  description String @db.Text
-  tax1 Float
-  tax2 Float
-  paymentMethod String
-  currency String
-  exchangeRate Float
-  category String
-  inv_number String?
-  recurrence String?
-  receipt_path MediaExpense[]
+model TransactionTax {
+  id            String     @id @default(uuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  name          String     
+  rate          Float
+  amount        Float
 
-  @@index([projectId])
-  @@index([supplierId])
-  @@index([orgId])
+  @@index([transactionId])
+}
+
+model MediaAttachment {
+  id              String        @id @default(uuid())
+  name            String        // Nombre original del archivo
+  type            String?       // Tipo de archivo (pdf, jpg, etc)
+  s3Key           String        @unique  // Ruta en S3
+  size            Int?          // Tamaño en bytes
+  transactionId   String
+  transaction     Transaction   @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  orgId           String        // Añadida relación directa con org
+  org             Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([transactionId])
+  @@index([orgId])    // Añadido índice para orgId
 }

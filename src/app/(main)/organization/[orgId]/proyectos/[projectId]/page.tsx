@@ -1,7 +1,6 @@
 import NavBar from "@/components/site/navigation/navBar";
 import ProjectPage from "./project-page";
-import { Project } from "@prisma/client";
-import { getClient, getProject } from "@/lib/queries";
+import { getClient, getClients, getProject, getProjectExpenses, getProjectIncome } from "@/lib/queries";
 
 export default async function ProjectDetails({
   params
@@ -19,16 +18,23 @@ export default async function ProjectDetails({
     );
   }
 
-  // Si no hay clientId, pasamos null como cliente
   let client = null;
   if (project.clientId) {
     client = await getClient(orgId, project.clientId);
   }
 
+  let incomes = null;
+  incomes = await getProjectIncome(orgId, projectId);
+
+  let expenses = null;
+  expenses = await getProjectExpenses(orgId, projectId);
+
+  const clients = await getClients(orgId);
+
   return (
     <NavBar>
       <div className="mx-4">
-        <ProjectPage orgId={orgId} projectId={projectId} project={project} client={client} />
+        <ProjectPage orgId={orgId} projectId={projectId} project={project} client={client} clients={clients} incomes={incomes || []} expenses={expenses || []} />
       </div>
     </NavBar>
   );

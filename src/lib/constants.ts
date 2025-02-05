@@ -128,40 +128,6 @@ export const statusIcons = {
   "Planning": "📝 Planeando",
 };
 
-
-export const getSideBar = (subAccountId: string) => [
-  {
-    name: 'Dashboard',
-    icon: 'layout-dashboard',
-    link: `/organization/${subAccountId}`,
-  },
-  {
-    name: 'Launchpad',
-    icon: 'clipboard',
-    link: `/organization/${subAccountId}/launchpad`,
-  },
-  {
-    name: 'Billing',
-    icon: 'credit-card',
-    link: `/organization/${subAccountId}/billing`,
-  },
-  {
-    name: 'Settings',
-    icon: 'settings',
-    link: `/organization/${subAccountId}/settings`,
-  },
-  {
-    name: 'Sub Accounts',
-    icon: 'book-user',
-    link: `/organization/${subAccountId}/all-subaccounts`,
-  },
-  {
-    name: 'Team',
-    icon: 'users',
-    link: `/organization/${subAccountId}/team`,
-  }
-];
-
 export const data = {
   navMain: [
     {

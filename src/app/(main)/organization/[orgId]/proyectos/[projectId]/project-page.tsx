@@ -19,10 +19,12 @@ import {
   Users2,
   Wallet,
 } from "lucide-react"
-import { Client, Project, ProjectStatus } from "@prisma/client"
+import { Party, Project, ProjectStatus, Transaction } from "@prisma/client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { ClientInfo } from "./client-info"
+import Link from "next/link"
+import NewIncomeForm from "./add-income"
 
 interface Task {
   id: string
@@ -41,7 +43,7 @@ interface Comment {
   timestamp: string
 }
 
-export default function ProjectPage({orgId, projectId, project, client}: {orgId:string, projectId:string, project:Project, client?:Client | null}) {
+export default function ProjectPage({orgId, projectId, project, client, clients, incomes, expenses}: {orgId:string, projectId:string, project:Project, clients?:Party[], client?:Party | null, incomes:Transaction[], expenses:Transaction[]}) {
     const [activeTab, setActiveTab] = useState("overview")
     
     const getStatusColor = (status: Task["status"]) => {
@@ -94,93 +96,111 @@ export default function ProjectPage({orgId, projectId, project, client}: {orgId:
     return (
       <div className="space-y-4">
         <div className={`${bgClasses[project.status]} text-white rounded-md p-6`}>
-          <div className="flex justify-between gap-2">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
+          <div className="space-y-4">
+            <div className="flex justify-between gap-2">
+              <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold truncate">{project.name}</h1>
                 <Badge variant="secondary" className="bg-white text-black">
                   #{project.id.slice(0, 5)}
                 </Badge>
               </div>
-              <div className="gap-4 text-gray-100">
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4 shrink-0" />
-                  <a 
-                    href={project.det_location && typeof project.det_location === 'object' && 'lat' in project.det_location ? 
-                      `https://www.google.com/maps?q=${project.det_location.lat},${project.det_location.lng}` : 
-                      undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline"
-                  >
-                    {project.location}
-                  </a>
-                </div>
-                <div className="flex items-center gap-1">
-                  <UserCircle className="w-4 h-4 shrink-0" />
-                  {client ? client.name : "No hay cliente asignado"}
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4 shrink-0" />
-                  {new Date(project.est_completion).toLocaleDateString("es-MX", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </div>
+              <div className="hidden md:flex gap-2">
+                <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white">
+                  Compartir
+                </Button>
+                <Link href={`/organization/${orgId}/proyectos/${projectId}/editar`}>
+                  <Button variant="secondary" className={`bg-white text-${getColor(project.status)}-600 hover:bg-white/90`}>
+                    Editar Proyecto
+                  </Button>
+                </Link>
+              </div>
+              
+              <div className="md:hidden">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      Compartir
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      Editar Proyecto
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
-            <div className="hidden md:flex gap-2">
-              <Button variant="secondary" className="bg-white/20 hover:bg-white/30 text-white">
-                Compartir
-              </Button>
-              <Button variant="secondary" className={`bg-white text-${getColor(project.status)}-600 hover:bg-white/90`}>
-                Editar Proyecto
-              </Button>
-            </div>
-            <div className="md:hidden">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    Compartir
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    Editar Proyecto
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div className="gap-4 text-gray-100">
+              <div className="flex items-center gap-1">
+                <MapPin className="w-4 h-4 shrink-0" />
+                <a 
+                  href={project.det_location && typeof project.det_location === 'object' && 'lat' in project.det_location ? 
+                    `https://www.google.com/maps?q=${project.det_location.lat},${project.det_location.lng}` : 
+                    undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  {project.location}
+                </a>
+              </div>
+              <div className="flex items-center gap-1">
+                <UserCircle className="w-4 h-4 shrink-0" />
+                {client ? client.name : "No hay cliente asignado"}
+              </div>
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4 shrink-0" />
+                {new Date(project.est_completion).toLocaleDateString("es-MX", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </div>
+              <div className="flex items-center gap-1">
+                <Wallet className="w-4 h-4 shrink-0" />
+                ${project.budget.toLocaleString("es-MX")}
+              </div>
             </div>
           </div>
           <div className="grid xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
             <Card className="bg-white/10 border-none">
               <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-gray-100 mb-2 truncate">
-                  <Wallet className="w-4 h-4 shrink-0" />
-                  Presupuesto
-                </div>
-                <div className="text-2xl font-bold text-white truncate">${project.budget.toLocaleString("es-MX")}</div>
-                <div className="text-sm text-gray-200 truncate">
-                  {/* Gastado: ${project.spent.toLocaleString("es-MX")} */}
-                  Gastado: $0.00
+                <div className="flex justify-between items-end">
+                  <div className="flex items-center gap-2 text-gray-100 mb-2 truncate">
+                    <Wallet className="w-4 h-4 shrink-0" />
+                    Ingresos
+                  </div>
+                  <NewIncomeForm 
+                    projectId={ projectId } 
+                    orgId={ orgId } 
+                    clients={ clients||[] } 
+                    onSubmit={ function ( data: any ): Promise<void> {
+                    throw new Error( "Function not implemented." )
+                  } }                    
+                  />
+                </div>                
+                <div className="text-2xl font-bold text-white truncate">
+                  {incomes.length > 0 ? ` $${incomes.reduce((acc, income) => acc + income.amount, 0).toLocaleString("es-MX")}` : "No hay ingresos aún"}
                 </div>
               </CardContent>
             </Card>
             <Card className="bg-white/10 border-none">
               <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-gray-100 mb-2">
-                  <Clock className="w-4 h-4 shrink-0" />
-                  Progreso
+                <div className="flex justify-between items-end">
+                  <div className="flex items-center gap-2 text-gray-100 mb-2 truncate">
+                    <Wallet className="w-4 h-4 shrink-0" />
+                    Gastos
+                  </div>
+                  <Button size='sm' variant='link' className="text-white">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>  
+                <div className="text-2xl font-bold text-white truncate">
+                  {expenses.length > 0 ? ` $${incomes.reduce((acc, income) => acc + income.amount, 0).toLocaleString("es-MX")}` : "No hay gastos aún"}
                 </div>
-                <div className="text-2xl font-bold text-white">
-                  {/* {project.progress}% */}
-                  30%
-                </div>
-                <Progress value={30} className="h-2 mt-2 bg-white" indicatorColor={`bg-${getColor(project.status)}-800`} />
               </CardContent>
             </Card>
             <Card className="bg-white/10 border-none">

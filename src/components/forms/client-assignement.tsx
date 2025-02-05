@@ -4,9 +4,8 @@ import React from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Client } from '@prisma/client'
 import { useToast } from '@/hooks/use-toast'
-import { createClient, assignClientToProject, removeClientFromProject, getClients } from '@/lib/queries'
+import { assignClientToProject, removeClientFromProject, getClients, createParty } from '@/lib/queries'
 import { X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -31,35 +30,36 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Loading from '../global/loading'
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'
+import { Party } from '@prisma/client';
 
 const FormSchema = z.object({
   name: z.string().min(2, { message: 'El nombre debe tener al menos 2 caracteres' }),
   phone: z.string().min(10, { message: 'El teléfono debe tener al menos 10 dígitos' }),
-  email: z.string().email({ message: 'Ingresa un email válido' }),
+  email: z.string().email({ message: 'Ingresa un email válido' }).optional(),
   company: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   country: z.string().optional(),
-  description: z.string().optional()
+  description: z.string().optional(),
 })
 
-interface ClientDialogProps {
+interface PartyDialogProps {
   projectId: string;
-  currentClientId?: string;
+  currentPartyId?: string;
   orgId: string;
-  onClientAssigned: () => void;
+  onPartyAssigned: () => void;
 }
 
-export const ClientDialog = ({
+export const PartyDialog = ({
   projectId,
-  currentClientId,
+  currentPartyId,
   orgId,
-  onClientAssigned,
-}: ClientDialogProps) => {
+  onPartyAssigned,
+}: PartyDialogProps) => {
   const [open, setOpen] = React.useState(false);
-  const [clients, setClients] = React.useState<Client[]>([]);
+  const [parties, setParties] = React.useState<Party[]>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const { toast } = useToast();
 
@@ -82,10 +82,11 @@ export const ClientDialog = ({
   const isLoading = form.formState.isSubmitting;
 
   React.useEffect(() => {
-    const fetchClients = async () => {
+    const fetchParties = async () => {
       try {
+        // Obtener solo los clientes (type: CLIENT)
         const data = await getClients(orgId);
-        setClients(data);
+        setParties(data);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -97,23 +98,23 @@ export const ClientDialog = ({
     };
 
     if (open) {
-      fetchClients();
+      fetchParties();
     }
   }, [open, orgId]);
 
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredParties = parties.filter((party) =>
+    party.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleAssignClient = async (clientId: string) => {
+  const handleAssignParty = async (partyId: string) => {
     try {
-      await assignClientToProject(projectId, clientId);
+      await assignClientToProject(projectId, partyId);
       toast({
         title: "Cliente asignado",
         description: "El cliente ha sido asignado exitosamente",
         duration: 3000
       });
-      onClientAssigned();
+      onPartyAssigned();
       setOpen(false);
     } catch (error) {
       toast({
@@ -133,7 +134,7 @@ export const ClientDialog = ({
         description: "El cliente ha sido removido exitosamente",
         duration: 3000
       });
-      onClientAssigned();
+      onPartyAssigned();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -146,12 +147,13 @@ export const ClientDialog = ({
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      const newClient = await createClient({
+      const newParty = await createParty({
         ...values,
         orgId,
+        type: 'CLIENT'
       });
 
-      await handleAssignClient(newClient.id);
+      await handleAssignParty(newParty.id);
       form.reset();
     } catch (error) {
       toast({
@@ -175,14 +177,14 @@ export const ClientDialog = ({
           >
             <span className="block sm:hidden">Cambiar</span>
             <span className="hidden sm:block">
-              {currentClientId ? "Cambiar Cliente" : "+ Asignar Cliente"}
+              {currentPartyId ? "Cambiar Cliente" : "+ Asignar Cliente"}
             </span>
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-2xl max-h-screen overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {currentClientId ? "Cambiar Cliente" : "Asignar Cliente al Proyecto"}
+              {currentPartyId ? "Cambiar Cliente" : "Asignar Cliente al Proyecto"}
             </DialogTitle>
             <DialogDescription>
               Selecciona un cliente existente o crea uno nuevo
@@ -212,10 +214,10 @@ export const ClientDialog = ({
                     />
                     <ScrollArea className="h-72">
                       <div className="space-y-4">
-                        {filteredClients.map((client) => (
+                        {filteredParties.map((client) => (
                           <div
                             key={client.id}
-                            onClick={() => handleAssignClient(client.id)}
+                            onClick={() => handleAssignParty(client.id)}
                             className="rounded-lg border bg-card p-6 cursor-pointer hover:bg-muted transition-colors"
                           >
                             <div className="flex flex-col space-y-1.5">
@@ -447,7 +449,7 @@ export const ClientDialog = ({
         </DialogContent>
       </Dialog>
 
-      {currentClientId && (
+      {currentPartyId && (
         <Button 
           variant="destructive" 
           size="icon"

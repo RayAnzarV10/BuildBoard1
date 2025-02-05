@@ -4,13 +4,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Client, Project } from "@prisma/client";
-import { ClientDialog } from "@/components/forms/client-assignement";
+import { Party, Project } from "@prisma/client";
+import { PartyDialog } from "@/components/forms/client-assignement";
 import Link from "next/link";
+import { formatPhoneNumber } from "@/components/global/phone-number";
 
 interface ClientInfoProps {
   project: Project;
-  client: Client | null;
+  client: Party | null;
   orgId: string;
 }
 
@@ -44,7 +45,7 @@ export const ClientInfo = ({ project, client, orgId }: ClientInfoProps) => {
             )}
             <div>
               <div className="text-sm text-muted-foreground">Teléfono</div>
-              <div className="font-medium">{client.phone}</div>
+              <div className="font-medium">{formatPhoneNumber(`${client.phone}`)}</div>
             </div>
             {client.email ? (
               <div>
@@ -58,11 +59,11 @@ export const ClientInfo = ({ project, client, orgId }: ClientInfoProps) => {
               <div className="text-sm text-muted-foreground">Dirección</div>
               <div className="font-medium truncate">{client.address}</div>
             </div>
-            <ClientDialog
+            <PartyDialog
               projectId={project.id}
-              currentClientId={client.id}
+              currentPartyId={client.id}
               orgId={orgId}
-              onClientAssigned={handleClientAssigned}
+              onPartyAssigned={handleClientAssigned}
             />
           </div>
         ) : (
@@ -72,10 +73,10 @@ export const ClientInfo = ({ project, client, orgId }: ClientInfoProps) => {
             <p className="text-sm text-gray-500 text-center">
               Asigna un cliente a este proyecto para ver su información
             </p>
-            <ClientDialog
+            <PartyDialog
               projectId={project.id}
               orgId={orgId}
-              onClientAssigned={handleClientAssigned}
+              onPartyAssigned={handleClientAssigned}
             />
           </div>
         )}

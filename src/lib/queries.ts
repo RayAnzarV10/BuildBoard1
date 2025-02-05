@@ -257,6 +257,32 @@ export const createProject = async (project: Project & { det_location?: Location
   }
 };
 
+export const updateProject = async (project: Partial<Project> & { det_location?: LocationCoordinates }) => {
+  try {
+    const response = await db.project.update({
+      where: {
+        id: project.id
+      },
+      data: {
+        name: project.name,
+        status: project.status,
+        location: project.location,
+        det_location: project.det_location ? {
+          lat: Number(project.det_location.lat),
+          lng: Number(project.det_location.lng)
+        } : Prisma.JsonNull,
+        description: project.description,
+        est_completion: project.est_completion,
+        budget: project.budget,
+      }
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 export const getNotificationAndUser = async (orgId: string) => {
   try {
     const response = await db.notification.findMany({
@@ -273,16 +299,10 @@ export const getNotificationAndUser = async (orgId: string) => {
 }
 
 export const getOrganizationIncome = async (orgId: string) => {
-  return await db.income.findMany({
-    where: { orgId }
-  });
-};
-
-export const getProjectIncome = async (orgId: string, projectId: string) => {
-  return await db.income.findMany({
+  return await db.transaction.findMany({
     where: { 
-      orgId,
-      projectId 
+      type: 'INCOME',
+      orgId: orgId,
     }
   });
 };
@@ -307,28 +327,35 @@ export const getProject = async (orgId: string, projectId: string) => {
     where: {
       id: projectId,
       orgId: orgId
+    },
+    include: {
+      transactions: true,
     }
   });
 }
 
-export const createClient = async (data: any) => {
-  return await db.client.create({
+export const createParty = async (data: any) => {
+  return await db.party.create({
     data
   });
 };
 
 export const getClient = async (orgId: string, clientId: string) => {
-  return await db.client.findUnique({
+  return await db.party.findUnique({
     where: {
+      type: 'CLIENT',
       id: clientId,
-      orgId
+      orgId,
     }
   });
 }
 
 export const getClients = async (orgId: string) => {
-  return await db.client.findMany({
-    where: { orgId },
+  return await db.party.findMany({
+    where: { 
+      type: 'CLIENT',
+      orgId: orgId,
+    },
     orderBy: {
       name: 'asc'
     }
@@ -354,3 +381,41 @@ export const removeClientFromProject = async (projectId: string) => {
     }
   });
 };
+
+export const getProjectIncome = async (orgId: string, projectId: string) => {
+  return await db.transaction.findMany({
+    where: {
+      orgId,
+      projectId,
+      type: 'INCOME'
+    },
+  });
+}
+
+export const getProjectExpenses = async (orgId: string, projectId: string) => {
+  return await db.transaction.findMany({
+    where: {
+      orgId,
+      projectId,
+      type: 'EXPENSE'
+    },
+  });
+}
+
+export const transaction = async (orgId: string, transactionId: string ) => {
+  return await db.transaction.findUnique({
+    where: { 
+      id: transactionId,
+      orgId: orgId 
+    },
+  });
+}
+
+export const attachment = async (fileData: any, transactionId: string) => {
+  return await db.mediaAttachment.create({
+    data: {
+      ...fileData,
+      transactionId: transactionId,
+    },
+  });
+}
