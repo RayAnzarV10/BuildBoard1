@@ -62,9 +62,9 @@ export const ProjectCard = ({ project, className }: { project: any, className?: 
               className="text-green-600 font-semibold text-sm"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
-              {project.income
+              {project.totalIncome
               ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-              project.income
+              project.totalIncome
               )
               : '$0'}
             </span>
@@ -75,9 +75,9 @@ export const ProjectCard = ({ project, className }: { project: any, className?: 
               className="text-red-600 font-semibold text-sm"
               style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
             >
-              {project.expense 
+              {project.totalExpense
                 ? new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
-                project.expense
+                project.totalExpense
               )
                 : '$0'}
             </span>

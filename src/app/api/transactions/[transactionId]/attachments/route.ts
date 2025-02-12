@@ -1,6 +1,7 @@
 // app/api/transactions/[transactionId]/attachments/route.ts
 import { NextResponse } from "next/server";
 import { uploadTransactionFile } from "@/lib/s3";
+import { verifyAndAcceptInvitation } from "@/lib/queries";
 
 export async function POST(
   req: Request,
@@ -8,6 +9,12 @@ export async function POST(
 ) {
   try {
     console.log('API Route - Starting file upload process');
+
+    // Verificar y obtener el orgId
+    const orgId = await verifyAndAcceptInvitation();
+    if (!orgId) {
+      return new NextResponse("No autorizado", { status: 401 });
+    }
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -23,10 +30,10 @@ export async function POST(
       size: file.size
     });
 
-    // Para archivos temporales, procesamos directamente
+    // Ahora usamos el orgId real en lugar de "temp-org"
     const fileData = await uploadTransactionFile(
       file, 
-      "temp-org", // Usamos un orgId temporal para pruebas
+      orgId,
       context.params.transactionId
     );
 

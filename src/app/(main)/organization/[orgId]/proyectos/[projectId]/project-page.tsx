@@ -5,12 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   BarChart,
   Calendar,
-  Clock,
   FileText,
   MapPin,
   MoreHorizontal,
@@ -21,10 +19,10 @@ import {
 } from "lucide-react"
 import { Party, Project, ProjectStatus, Transaction } from "@prisma/client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
 import { ClientInfo } from "./client-info"
 import Link from "next/link"
-import NewIncomeForm from "./add-income"
+import { NewIncomeForm } from "./add-income"
+import { ProjectPageProps } from "@/lib/types"
 
 interface Task {
   id: string
@@ -43,7 +41,13 @@ interface Comment {
   timestamp: string
 }
 
-export default function ProjectPage({orgId, projectId, project, client, clients, incomes, expenses}: {orgId:string, projectId:string, project:Project, clients?:Party[], client?:Party | null, incomes:Transaction[], expenses:Transaction[]}) {
+export default function ProjectPage({ 
+  orgId, 
+  projectId, 
+  project,
+  client,
+  clients,
+}: ProjectPageProps) {
     const [activeTab, setActiveTab] = useState("overview")
     
     const getStatusColor = (status: Task["status"]) => {
@@ -90,8 +94,6 @@ export default function ProjectPage({orgId, projectId, project, client, clients,
       "In_Progress": 'bg-gradient-to-r from-blue-600 to-blue-900',
       "Completed": 'bg-gradient-to-r from-green-600 to-green-900',
     }
-
-    const router = useRouter()
 
     return (
       <div className="space-y-4">
@@ -161,7 +163,7 @@ export default function ProjectPage({orgId, projectId, project, client, clients,
               </div>
               <div className="flex items-center gap-1">
                 <Wallet className="w-4 h-4 shrink-0" />
-                ${project.budget.toLocaleString("es-MX")}
+                ${project.budget}
               </div>
             </div>
           </div>
@@ -176,11 +178,11 @@ export default function ProjectPage({orgId, projectId, project, client, clients,
                   <NewIncomeForm 
                     projectId={ projectId } 
                     orgId={ orgId } 
-                    clients={ clients||[] } 
+                    clients={ clients || [] } 
                   />
                 </div>                
                 <div className="text-2xl font-bold text-white truncate">
-                  {incomes.length > 0 ? ` $${incomes.reduce((acc, income) => acc + income.amount, 0).toLocaleString("es-MX")}` : "No hay ingresos aún"}
+                  {project.totalIncome?.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
                 </div>
               </CardContent>
             </Card>
@@ -196,7 +198,7 @@ export default function ProjectPage({orgId, projectId, project, client, clients,
                   </Button>
                 </div>  
                 <div className="text-2xl font-bold text-white truncate">
-                  {expenses.length > 0 ? ` $${incomes.reduce((acc, income) => acc + income.amount, 0).toLocaleString("es-MX")}` : "No hay gastos aún"}
+                  $0
                 </div>
               </CardContent>
             </Card>

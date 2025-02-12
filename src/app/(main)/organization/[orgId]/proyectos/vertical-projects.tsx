@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 import GoogleMapsPin from "@/components/global/GoogleMap"
+import { SafeProject } from "@/lib/types"
 
 interface Project {
   number: number
@@ -33,10 +34,13 @@ interface Project {
     lng: number;
   }
   budget: number
+  clientId: string | null
+  totalIncome: number
+  totalExpense: number
 }
 
 interface ProjectDetailsProps {
-  project: Project | null
+  project: SafeProject | null
 }
 
 const ProjectDetails = ({ project }: ProjectDetailsProps) => {
@@ -182,14 +186,14 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
 
   return (
     <div className="flex-grow flex items-center grid grid-cols-[40%_60%] xs:grid-cols-1 mr-4 gap-4">
-      <Card className={`bg-primary-foreground shadow-xl dark:bg-card w-full h-[calc(100vh-6.2rem)] flex flex-col ${className}`}>
+      <Card className={`bg-primary-foreground shadow-xl dark:bg-card justify-end w-full h-[calc(100vh-6.2rem)] flex flex-col ${className}`}>
         <CardHeader className="flex flex-col">
           <div className="flex flex-row items-end justify-between">
             <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
             <Link href={`/organization/${orgId}/proyectos/nuevo`}>
-                <Button className="text-xs h-7 px-2">
-                  Nuevo Proyecto
-                </Button>
+              <Button className="text-xs h-7 px-2">
+                Nuevo Proyecto
+              </Button>
             </Link>
           </div>
           <CardDescription className="truncate">Explora tus proyectos y sus detalles</CardDescription>
@@ -242,7 +246,7 @@ export default function VerticalProjects({ orgId, className }: VerticalProjectsP
               </div>
               <ScrollArea className="rounded-md items-center flex-grow">
                 {getFilteredAndSortedProjects().length === 0 ? (
-                  <p className="w-full text-center text-muted-foreground">No se encontraron proyectos</p>
+                  <p className="w-full text-center text-muted-foreground">No existen proyectos aún</p>
                 ) : (
                   <div className="grid grid-cols-1 gap-4">
                     {getFilteredAndSortedProjects().map(project => (

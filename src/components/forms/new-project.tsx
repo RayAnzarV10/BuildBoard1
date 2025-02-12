@@ -4,7 +4,7 @@ import React, { useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { z } from 'zod'
-import { Project, ProjectStatus } from '@prisma/client'
+import { Prisma, Project, ProjectStatus } from '@prisma/client'
 import { useToast } from '@/hooks/use-toast'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,7 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale/es'
 import { CalendarIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, toDecimal } from '@/lib/utils'
 import Loading from '../global/loading'
 import { Separator } from '../ui/separator'
 
@@ -53,7 +53,7 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
       location: data?.location,
       det_location: data?.det_location as { lat: number, lng: number },
       est_completion: data?.est_completion,
-      budget: data?.budget,
+      budget: data?.budget ? Number(data?.budget) : undefined,
       description: data?.description,
     }
   })
@@ -63,7 +63,8 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
     if (data?.id) {
       const formData = {
         ...data,
-        det_location: data.det_location as { lat: number; lng: number }
+        det_location: data.det_location as { lat: number; lng: number },
+        budget: data.budget ? Number(data.budget) : undefined
       }
       form.reset(formData)
     }
@@ -84,7 +85,7 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
           location: values.location,
           det_location: values.det_location,
           est_completion: values.est_completion,
-          budget: values.budget,
+          budget: toDecimal( values.budget ),
           description: values.description,
           clientId: null
         })
@@ -246,6 +247,9 @@ const CreateProject = ({data, orgId}: Props & {orgId: string}) => {
                         <Calendar
                           mode="single"
                           selected={field.value || ''}
+                          // captionLayout='dropdown-buttons'
+                          // fromYear={2020}
+                          // toYear={2027}
                           onSelect={field.onChange}
                           initialFocus
                         />

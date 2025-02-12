@@ -170,9 +170,11 @@ model Project {
   location              String                @db.Text
   det_location          Json?                
   est_completion        DateTime    
-  budget                Float
+  budget                Decimal
   description           String                @db.Text
   transactions          Transaction[]
+  totalIncome           Decimal               @default(0)
+  totalExpense          Decimal               @default(0)
   clientId              String?
   client                Party?                @relation(fields: [clientId], references: [id])
 
@@ -215,11 +217,12 @@ enum TransactionType {
 }
 
 enum PaymentMethod {
-  CASH
-  TRANSFER
-  CREDIT_CARD
-  DEBIT_CARD
-  OTHER
+  EFECTIVO
+  TRANSFERENCIA
+  TARJETA_CREDITO
+  TARJETA_DEBITO
+  TPV
+  CHEQUE
 }
 
 enum Currency {
@@ -241,12 +244,12 @@ model Transaction {
   date          DateTime
   partyId       String        // clientId o supplierId
   party         Party         @relation(fields: [partyId], references: [id]) // Unifica Client y Supplier
-  amount        Float
+  amount        Decimal
   taxes         TransactionTax[]
-  description   String        @db.Text
+  description   String?        @db.Text
   paymentMethod PaymentMethod
   currency      Currency
-  exchangeRate  Float
+  exchangeRate  Decimal
   category      String        // O usar enum si las categorías son fijas
   invoiceNumber String?
   recurrence    String?
@@ -263,7 +266,7 @@ model TransactionTax {
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   name          String     
   rate          Float
-  amount        Float
+  amount        Decimal
 
   @@index([transactionId])
 }

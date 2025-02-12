@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getOrganizationIncome } from '@/lib/queries';
+import { getOrganizationIncomeTransactions } from '@/lib/queries';
 import { Badge } from '../ui/badge';
 import { DollarSign, MoveRight, TrendingDown, TrendingUp } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const TotalIncomeCard = ({ orgId }: { orgId:string }) => {
   useEffect(() => {
     const fetchIncomeData = async () => {
       try {
-        const incomes = await getOrganizationIncome(orgId);
+        const incomes = await getOrganizationIncomeTransactions(orgId);
         
         // Obtener fecha actual
         const now = new Date();

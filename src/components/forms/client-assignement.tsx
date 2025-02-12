@@ -32,6 +32,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import Loading from '../global/loading'
 import { useRouter } from 'next/navigation'
 import { Party } from '@prisma/client';
+import Link from 'next/link';
 
 const FormSchema = z.object({
   name: z.string().min(2, { message: 'El nombre debe tener al menos 2 caracteres' }),
@@ -237,12 +238,13 @@ export const PartyDialog = ({
                     </ScrollArea>
                   </div>
                 </div>
-                <div 
-                  onClick={() => router.push(`/organization/${orgId}/clientes`)}
-                  className="p-4 mt-2 border-t text-center hover:bg-muted transition-colors cursor-pointer"
-                >
-                  <span className="text-blue-500">Ver todos los clientes →</span>
-                </div>
+                <Link href={`/organization/${orgId}/clientes`}>
+                  <div 
+                    className="p-4 mt-2 border-t text-center hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <span className="text-blue-500">Ver todos los clientes →</span>
+                  </div>
+                </Link>
               </div>
             </TabsContent>
 
@@ -321,6 +323,7 @@ export const PartyDialog = ({
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Email</FormLabel>
+                              <FormLabel className='text-muted-foreground'> (Opcional)</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="correo@ejemplo.com"

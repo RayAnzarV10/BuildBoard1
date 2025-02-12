@@ -8,9 +8,10 @@ import { Party, Project } from "@prisma/client";
 import { PartyDialog } from "@/components/forms/client-assignement";
 import Link from "next/link";
 import { formatPhoneNumber } from "@/components/global/phone-number";
+import { SafeProject } from "@/lib/types";
 
 interface ClientInfoProps {
-  project: Project;
+  project: SafeProject;
   client: Party | null;
   orgId: string;
 }

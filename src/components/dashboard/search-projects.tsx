@@ -77,7 +77,9 @@ export default function Projects({ orgId, className }: { orgId: string, classNam
   return (
     <Card className={`bg-primary-foreground shadow-lg dark:bg-card w-full ${className}`}>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-2xl font-bold truncate">Proyectos</CardTitle>
+        <Link href={`/organization/${orgId}/proyectos`} >
+          <CardTitle className="text-2xl font-bold hover:underline truncate">Proyectos</CardTitle>
+        </Link>
       </CardHeader>
       <CardContent className="space-y-4">
         {loading ? (
@@ -122,7 +124,7 @@ export default function Projects({ orgId, className }: { orgId: string, classNam
             </div>
             <ScrollArea className="rounded-md items-center h-[26rem]">
               {getFilteredAndSortedProjects().length === 0 ? (
-                <p className="w-full text-center text-muted-foreground">No se encontraron proyectos</p>
+                <p className="w-full text-center text-muted-foreground mt-4">No existen proyectos aún</p>
               ) : (
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                   {getFilteredAndSortedProjects().map(project => (

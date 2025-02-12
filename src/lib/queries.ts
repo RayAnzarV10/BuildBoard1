@@ -232,25 +232,22 @@ interface LocationCoordinates {
   lng: string | number;
 }
 
-export const createProject = async (project: Project & { det_location?: LocationCoordinates }) => {
+export const createProject = async (project: Omit<Project, 'totalIncome' | 'totalExpense'> & { det_location?: LocationCoordinates }) => {
   try {
     const response = await db.project.create({
       data: {
-        number: project.number,
-        name: project.name,
-        orgId: project.orgId,
-        status: project.status,
-        location: project.location,
-        det_location: project.det_location ? {
-          lat: Number(project.det_location.lat),
-          lng: Number(project.det_location.lng)
-        } : Prisma.JsonNull,
-        description: project.description,
-        est_completion: project.est_completion,
-        budget: project.budget,
+        ...project,
+        totalIncome: 0,
+        totalExpense: 0,
       }
     });
-    return response;
+
+    return {
+      ...response,
+      budget: Number(response.budget),
+      totalIncome: Number(response.totalIncome),
+      totalExpense: Number(response.totalExpense)
+    };
   } catch (error) {
     console.log(error);
     throw error;
@@ -298,32 +295,75 @@ export const getNotificationAndUser = async (orgId: string) => {
   }
 }
 
-export const getOrganizationIncome = async (orgId: string) => {
-  return await db.transaction.findMany({
+export const getOrganizationIncomeTransactions = async (orgId: string) => {
+  const transactions = await db.transaction.findMany({
     where: { 
       type: 'INCOME',
       orgId: orgId,
     }
   });
+
+  return transactions.map(transaction => ({
+    ...transaction,
+    amount: Number(transaction.amount),
+    exchangeRate: Number(transaction.exchangeRate)
+  }));
+};
+
+export const getOrganizationTotalIncome = async (orgId: string) => {
+  const result = await db.project.aggregate({
+    where: {
+      orgId
+    },
+    _sum: {
+      totalIncome: true
+    }
+  });
+
+  return Number(result._sum.totalIncome) || 0;
 };
 
 export const getProjectWhere = async (orgId: string, status: ProjectStatus) => {
-  return await db.project.findMany({
+  const projects = await db.project.findMany({
     where: {
       orgId: orgId,
       status: status
     }
   });
-}
+
+  return projects.map(project => ({
+    ...project,
+    budget: Number(project.budget),
+    totalIncome: Number(project.totalIncome),
+    totalExpense: Number(project.totalExpense)
+  }));
+};
 
 export const getAllProjects = async (orgId: string) => {
-  return await db.project.findMany({
-    where: { orgId }
+  const projects = await db.project.findMany({
+    where: {
+      orgId,
+    },
+    include: {
+      transactions: true,
+    }
   });
-}
+
+  return projects.map(project => ({
+    ...project,
+    budget: Number(project.budget),
+    totalIncome: Number(project.totalIncome),
+    totalExpense: Number(project.totalExpense),
+    transactions: project.transactions.map(transaction => ({
+      ...transaction,
+      amount: Number(transaction.amount),
+      exchangeRate: Number(transaction.exchangeRate)
+    }))
+  }));
+};
 
 export const getProject = async (orgId: string, projectId: string) => {
-  return await db.project.findUnique({
+  const project = await db.project.findUnique({
     where: {
       id: projectId,
       orgId: orgId
@@ -332,7 +372,21 @@ export const getProject = async (orgId: string, projectId: string) => {
       transactions: true,
     }
   });
-}
+
+  if (!project) return null;
+
+  return {
+    ...project,
+    budget: Number(project.budget),
+    totalIncome: Number(project.totalIncome),
+    totalExpense: Number(project.totalExpense),
+    transactions: project.transactions.map(transaction => ({
+      ...transaction,
+      amount: Number(transaction.amount),
+      exchangeRate: Number(transaction.exchangeRate)
+    }))
+  };
+};
 
 export const createParty = async (data: any) => {
   return await db.party.create({
@@ -341,17 +395,31 @@ export const createParty = async (data: any) => {
 };
 
 export const getClient = async (orgId: string, clientId: string) => {
-  return await db.party.findUnique({
+  const client = await db.party.findUnique({
     where: {
       type: 'CLIENT',
       id: clientId,
       orgId,
+    },
+    include: {
+      transactions: true, // Incluimos las transacciones
     }
   });
-}
+
+  if (!client) return null;
+
+  return {
+    ...client,
+    transactions: client.transactions.map(transaction => ({
+    ...transaction,
+    amount: Number(transaction.amount),
+    exchangeRate: Number(transaction.exchangeRate)
+    }))
+  };
+};
 
 export const getClients = async (orgId: string) => {
-  return await db.party.findMany({
+  const clients = await db.party.findMany({
     where: { 
       type: 'CLIENT',
       orgId: orgId,
@@ -360,6 +428,8 @@ export const getClients = async (orgId: string) => {
       name: 'asc'
     }
   });
+
+  return clients
 };
 
 export const assignClientToProject = async (projectId: string, clientId: string) => {
@@ -392,24 +462,72 @@ export const getProjectIncome = async (orgId: string, projectId: string) => {
   });
 }
 
+export const getProjectTotals = async (projectId: string) => {
+  const totals = await db.project.findUnique({
+    where: { id: projectId },
+    select: {
+      totalIncome: true,
+      totalExpense: true
+    }
+  });
+
+  if (!totals) return null;
+
+  return {
+    totalIncome: Number(totals.totalIncome),
+    totalExpense: Number(totals.totalExpense)
+  };
+};
+
 export const getProjectExpenses = async (orgId: string, projectId: string) => {
-  return await db.transaction.findMany({
+  const expenses = await db.transaction.findMany({
     where: {
       orgId,
       projectId,
       type: 'EXPENSE'
     },
   });
-}
+
+  return expenses.map(expense => ({
+    ...expense,
+    amount: Number(expense.amount)
+  }));
+};
+
+export const getProjectTransactions = async (orgId: string, projectId: string) => {
+  const transactions = await db.transaction.findMany({
+    where: {
+      orgId,
+      projectId,
+    },
+    select: {
+      amount: true,
+      type: true,
+    }
+  });
+
+  return transactions.map(transaction => ({
+    ...transaction,
+    amount: Number(transaction.amount)
+  }));
+};
 
 export const transaction = async (orgId: string, transactionId: string ) => {
-  return await db.transaction.findUnique({
+  const result = await db.transaction.findUnique({
     where: { 
       id: transactionId,
       orgId: orgId 
     },
   });
-}
+
+  if (!result) return null;
+
+  return {
+    ...result,
+    amount: Number(result.amount),
+    exchangeRate: Number(result.exchangeRate)
+  };
+};
 
 export const attachment = async (fileData: any, transactionId: string) => {
   return await db.mediaAttachment.create({
@@ -421,7 +539,26 @@ export const attachment = async (fileData: any, transactionId: string) => {
 }
 
 export const createTransaction = async (transaction: any) => {
-  return await db.transaction.create({
-    data: transaction
+  return await db.$transaction(async (tx) => {
+    // Crear la transacción
+    const newTransaction = await tx.transaction.create({
+      data: transaction
+    });
+
+    // Actualizar el total correspondiente en el proyecto
+    await tx.project.update({
+      where: { 
+        id: transaction.projectId 
+      },
+      data: transaction.type === 'INCOME' 
+        ? { totalIncome: { increment: transaction.amount } }
+        : { totalExpense: { increment: transaction.amount } }
+    });
+
+    return {
+      ...newTransaction,
+      amount: Number(newTransaction.amount),
+      exchangeRate: Number(newTransaction.exchangeRate)
+    };
   });
-}
+};

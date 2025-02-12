@@ -1,5 +1,5 @@
 // lib/s3.ts
-import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 // Imprimimos las variables de entorno para debug (sin imprimir los valores sensibles)
 console.log('AWS Config:', {

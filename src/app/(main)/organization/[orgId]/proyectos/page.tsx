@@ -4,10 +4,10 @@ import VerticalProjects from "./vertical-projects";
 export default async function ProjectDetails({ 
   params 
 }: { 
-  params: { orgId: string; projectId: string } 
+  params: { orgId: string} 
 }) {
   // Esperar los params
-  const { orgId, projectId } = await params;
+  const { orgId } = await params;
 
   return (
     <NavBar>
