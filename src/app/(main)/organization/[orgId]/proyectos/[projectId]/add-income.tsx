@@ -91,7 +91,7 @@ export const NewIncomeForm = ({
       description: data?.description || '',
       paymentMethod: data?.paymentMethod || PaymentMethod.EFECTIVO,
       currency: data?.currency || Currency.MXN,
-      exchangeRate: data?.exchangeRate ? Number(data.exchangeRate) : undefined,
+      exchangeRate: data?.exchangeRate ? Number(data.exchangeRate) : 1,
       category: data?.category || '',
       invoiceNumber: data?.invoiceNumber || undefined,
     },
@@ -260,11 +260,18 @@ export const NewIncomeForm = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {clients.map((client) => (
+                      {clients.length > 0 ? (
+                        clients.map((client) => (
                           <SelectItem key={client.id} value={client.id}>
                             {client.name}
                           </SelectItem>
-                        ))}
+                        ))
+                      ) : (
+                        <SelectItem value="no-client" disabled>
+                          No hay clientes registrados
+                        </SelectItem>
+                      )}
+
                       </SelectContent>
                     </Select>
                     <FormMessage />

@@ -39,8 +39,8 @@ export const projects = [
     location: 'Guadalajara', 
     est_completion: '2024-12-31',
     budget: 1500000.0,
-    income: 1225000,
-    expense: 1016112.50,
+    totalIncome: 1225000,
+    totalExpense: 1016112.50,
     description: 'Proyecto de construcción de edificio comercial'
   },
   {
@@ -50,76 +50,10 @@ export const projects = [
     location: 'Chapala', 
     est_completion: '2024-09-10',
     budget: 6500000.0,
-    income: 6525000.0,
-    expense: 5972923.0,
+    totalIncome: 6525000.0,
+    totalExpense: 5972923.0,
     description: 'Casa de campo con estilo rústico' 
-  },
-  {
-    number: '3',
-    name: 'Casa de la Sierra',
-    status: 'Planeando', 
-    location: 'Tapalpa', 
-    est_completion: '2024-06-30',
-    budget: 4500000.0,
-    income: 0.0,
-    expense: 0.0,
-    description: 'Casa de campo con estilo moderno' 
-  },
-  {
-    number: '4',
-    name: 'Edificio B',
-    status: 'Planeando', 
-    location: 'Zapopan', 
-    est_completion: '2024-12-31',
-    budget: 2000000.0,
-    income: 0.0,
-    expense: 0.0,
-    description: 'Proyecto de construcción de edificio comercial' 
-  },
-  {
-    number: '5',
-    name: 'Casa de la Colina',
-    status: 'Completado', 
-    location: 'Tlaquepaque', 
-    est_completion: '2024-09-10',
-    budget: 3500000.0,
-    income: 3525000.0,
-    expense: 2972923.0,
-    description: 'Casa de campo con estilo rústico' 
-  },
-  {
-    number: '6',
-    name: 'Edificio C',
-    status: 'En Progreso', 
-    location: 'Zapopan', 
-    est_completion: '2024-12-31',
-    budget: 2500000.0,
-    income: 2225000.0,
-    expense: 2016112.50,
-    description: 'Proyecto de construcción de edificio comercial' 
-  },
-  {
-    number: '7',
-    name: 'Casa de la Laguna',
-    status: 'Planeando', 
-    location: 'Chapala', 
-    est_completion: '2024-06-30',
-    budget: 1500000.0,
-    income: 0.0,
-    expense: 0.0,
-    description: 'Casa de campo con estilo moderno' 
-  },
-  {
-    number: '8',
-    name: 'Casa de la Montaña',
-    status: 'Completado', 
-    location: 'Tapalpa', 
-    est_completion: '2024-09-10',
-    budget: 5500000.0,
-    income: 5525000.0,
-    expense: 4972923.0,
-    description: 'Casa de campo con estilo rústico' 
-  },
+  }
 ]
 
 export const statusIcons = {

@@ -16,7 +16,7 @@ export default async function ProjectDetails({
       <NavBar>
         <div>Proyecto no encontrado!</div>
       </NavBar>
-    );.
+    );
   }
 
   let client = null;

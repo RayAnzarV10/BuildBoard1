@@ -433,23 +433,59 @@ export const getClients = async (orgId: string) => {
 };
 
 export const assignClientToProject = async (projectId: string, clientId: string) => {
-  return await db.project.update({
+  const updatedProject = await db.project.update({
     where: { id: projectId },
     data: { 
       clientId: clientId,
       updatedAt: new Date()
+    },
+    include: {
+      // Assuming you might want to include related decimal fields
+      transactions: true
     }
   });
+  
+  // Process any decimal fields in the returned project data
+  return {
+    ...updatedProject,
+    totalIncome: Number(updatedProject.totalIncome),
+    totalExpense: Number(updatedProject.totalExpense),
+    budget: Number(updatedProject.budget),
+    // Process transactions if included
+    transactions: updatedProject.transactions?.map(tx => ({
+      ...tx,
+      amount: Number(tx.amount),
+      exchangeRate: tx.exchangeRate ? Number(tx.exchangeRate) : null
+    }))
+  };
 };
 
 export const removeClientFromProject = async (projectId: string) => {
-  return await db.project.update({
+  const updatedProject = await db.project.update({
     where: { id: projectId },
     data: { 
       clientId: null,
       updatedAt: new Date()
+    },
+    include: {
+      // Assuming you might want to include related decimal fields
+      transactions: true
     }
   });
+  
+  // Process any decimal fields in the returned project data
+  return {
+    ...updatedProject,
+    totalIncome: Number(updatedProject.totalIncome),
+    totalExpense: Number(updatedProject.totalExpense),
+    budget: Number(updatedProject.budget),
+    // Process transactions if included
+    transactions: updatedProject.transactions?.map(tx => ({
+      ...tx,
+      amount: Number(tx.amount),
+      exchangeRate: tx.exchangeRate ? Number(tx.exchangeRate) : null
+    }))
+  };
 };
 
 export const getProjectIncome = async (orgId: string, projectId: string) => {

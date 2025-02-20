@@ -17,7 +17,7 @@ import {
   Users2,
   Wallet,
 } from "lucide-react"
-import { Party, Project, ProjectStatus, Transaction } from "@prisma/client"
+import { ProjectStatus } from "@prisma/client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ClientInfo } from "./client-info"
 import Link from "next/link"
@@ -151,7 +151,17 @@ export default function ProjectPage({
               </div>
               <div className="flex items-center gap-1">
                 <UserCircle className="w-4 h-4 shrink-0" />
-                {client ? client.name : "No hay cliente asignado"}
+                {client ? (
+                  <Link 
+                    href={`/organization/${orgId}/clientes/${client.id}`}
+                    className="hover:underline"
+                  >
+                    {client.name}
+                  </Link>
+                  ) : (
+                    "No hay cliente asignado"
+                  )
+                }
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4 shrink-0" />
@@ -163,7 +173,7 @@ export default function ProjectPage({
               </div>
               <div className="flex items-center gap-1">
                 <Wallet className="w-4 h-4 shrink-0" />
-                ${project.budget}
+                {project.budget?.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
               </div>
             </div>
           </div>
@@ -198,7 +208,7 @@ export default function ProjectPage({
                   </Button>
                 </div>  
                 <div className="text-2xl font-bold text-white truncate">
-                  $0
+                  {project.totalExpense?.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
                 </div>
               </CardContent>
             </Card>
